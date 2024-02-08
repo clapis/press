@@ -9,7 +9,8 @@ namespace Press.Scrapers
         {
             return services
                 .AddTransient<IContentExtractor, ContentExtractor>()
-                .AddTransient<IPublicationScraper, PublicationScraper>();
+                .AddTransient<IPublicationProvider, Franca.PublicationProvider>()
+                .AddTransient<IPublicationProvider, SaoCarlos.PublicationProvider>();
         }
     }
 }

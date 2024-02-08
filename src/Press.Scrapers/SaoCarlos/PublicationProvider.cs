@@ -11,14 +11,14 @@ using Microsoft.Extensions.Logging;
 using Polly;
 using Press.Core.Publications;
 
-namespace Press.Scrapers
+namespace Press.Scrapers.SaoCarlos
 {
-    public class PublicationScraper : IPublicationScraper
+    public class PublicationProvider : IPublicationProvider
     {
-        private readonly ILogger<PublicationScraper> _logger;
-        public PublicationScraper(ILogger<PublicationScraper> logger) => _logger = logger;
+        private readonly ILogger<PublicationProvider> _logger;
+        public PublicationProvider(ILogger<PublicationProvider> logger) => _logger = logger;
 
-        public async IAsyncEnumerable<ScrapedItem> ScrapeAsync(CancellationToken cancellationToken)
+        public async IAsyncEnumerable<Publication> ProvideAsync(CancellationToken cancellationToken)
         {
             foreach (var page in Pages())
             {
@@ -26,7 +26,11 @@ namespace Press.Scrapers
                 
                 foreach (var link in links)
                 {
-                    yield return new(GetDateFromLink(link), link);
+                    yield return new Publication
+                    {
+                        Url = link,
+                        Date = GetDateFromLink(link)
+                    };
                 }
             }
         }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -10,18 +11,18 @@ namespace Press.Core.Publications
     {
         private readonly IPublicationStore _store;
         private readonly IContentExtractor _extractor;
-        private readonly IPublicationScraper _provider;
+        private readonly IEnumerable<IPublicationProvider> _providers;
         private readonly ILogger<SynchronizationService> _logger;
 
         public SynchronizationService(
             IPublicationStore store,
             IContentExtractor extractor,
-            IPublicationScraper provider, 
+            IEnumerable<IPublicationProvider> providers, 
             ILogger<SynchronizationService> logger)
         {
             _store = store;
             _extractor = extractor;
-            _provider = provider;
+            _providers = providers;
             _logger = logger;
         }
 
@@ -32,27 +33,25 @@ namespace Press.Core.Publications
             var stored = new HashSet<string>(urls, StringComparer.OrdinalIgnoreCase);
 
             // Scrape sources for publications
-            var scraped = _provider.ScrapeAsync(cancellationToken);
-
-            await foreach (var scrape in scraped)
+            await foreach (var publication in GetPublicationsAsync(cancellationToken))
             {
                 // Exclude publications we already have downloaded
-                if (stored.Contains(scrape.Link))
+                if (stored.Contains(publication.Url))
                     continue;
 
                 // Extract contents 
-                var contents = await _extractor.ExtractAsync(scrape.Link, cancellationToken);
-
-                var publication = new Publication
-                {
-                    Url = scrape.Link,
-                    Contents = contents,
-                    Date = scrape.Date
-                };
+                publication.Contents = await _extractor.ExtractAsync(publication.Url, cancellationToken);
 
                 // Store the publication
                 await _store.SaveAsync(publication, cancellationToken);
             }
+        }
+
+        private async IAsyncEnumerable<Publication> GetPublicationsAsync([EnumeratorCancellation] CancellationToken cancellationToken)
+        {
+            foreach (var provider in _providers)
+                await foreach (var publication in provider.ProvideAsync(cancellationToken))
+                    yield return publication;
         }
     }
 }

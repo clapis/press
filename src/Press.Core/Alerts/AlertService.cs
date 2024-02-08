@@ -31,17 +31,16 @@ namespace Press.Core.Alerts
                 var pubs = await _publicationStore.SearchAsync(alert.Term, cancellationToken);
 
                 var notifications = pubs.Where(p => p.Date > alert.LastNotification).ToList();
-                
-                if (notifications.Any())
-                {
-                    var info = new NotificationInfo(alert, notifications, date);
-                    
-                    await _notificationService.SendAlertAsync(info, cancellationToken);
 
-                    alert.LastNotification = notifications.Max(x => x.Date);
+                if (!notifications.Any()) continue;
+                
+                var info = new NotificationInfo(alert, notifications, date);
                     
-                    await _alertStore.UpdateAsync(alert, cancellationToken);
-                }
+                await _notificationService.SendAlertAsync(info, cancellationToken);
+
+                alert.LastNotification = notifications.Max(x => x.Date);
+                    
+                await _alertStore.UpdateAsync(alert, cancellationToken);
             }
         }
     }

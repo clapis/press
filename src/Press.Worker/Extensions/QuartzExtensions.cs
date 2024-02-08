@@ -21,9 +21,7 @@ namespace Press.Worker.Extensions
 
             // Some minor validation
             if (string.IsNullOrEmpty(cronSchedule))
-            {
                 throw new Exception($"No Quartz.NET Cron schedule found for job in configuration at {configKey}");
-            }
 
             // register the job as before
             var jobKey = new JobKey(jobName);
