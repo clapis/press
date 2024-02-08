@@ -1,5 +1,3 @@
-using System;
-using Microsoft.Extensions.Configuration;
 using Quartz;
 
 namespace Press.Worker.Extensions

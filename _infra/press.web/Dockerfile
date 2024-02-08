@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/sdk:5.0-alpine AS build-env
+FROM mcr.microsoft.com/dotnet/sdk:7.0-alpine AS build-env
 ARG StartupProject
 
 WORKDIR /build
@@ -6,7 +6,7 @@ COPY . .
 RUN dotnet publish ./src/${StartupProject}/${StartupProject}.csproj -c Release -o publish
 
 # Build runtime image
-FROM mcr.microsoft.com/dotnet/aspnet:5.0-alpine
+FROM mcr.microsoft.com/dotnet/aspnet:7.0-alpine
 ARG StartupProject
 
 ENV StartupProject=${StartupProject}

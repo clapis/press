@@ -1,7 +1,3 @@
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Press.Core;
 using Press.Core.Alerts;
 using Press.MongoDb;
@@ -22,7 +18,7 @@ namespace Press.Worker
             CreateHostBuilder(args).Build().Run();
         }
 
-        public static IHostBuilder CreateHostBuilder(string [] args) =>
+        private static IHostBuilder CreateHostBuilder(string [] args) =>
             Host.CreateDefaultBuilder(args)
                 .ConfigureLogging((context, builder) => 
                     builder.AddSeq(context.Configuration.GetSection("Seq")))
@@ -40,7 +36,7 @@ namespace Press.Worker
 
                     services.AddQuartz(q =>
                     {
-                        q.UseMicrosoftDependencyInjectionScopedJobFactory();
+                        q.UseMicrosoftDependencyInjectionJobFactory();
                         
                         q.AddJobAndTrigger<SyncJob>(context.Configuration);
                         q.AddJobAndTrigger<AlertJob>(context.Configuration);

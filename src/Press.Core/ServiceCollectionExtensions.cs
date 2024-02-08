@@ -9,7 +9,6 @@ namespace Press.Core
         public static IServiceCollection AddPressCore(this IServiceCollection services)
         {
             services
-                .AddHttpClient()
                 .AddTransient<AlertService>()
                 .AddTransient<ReportService>()
                 .AddTransient<SynchronizationService>();

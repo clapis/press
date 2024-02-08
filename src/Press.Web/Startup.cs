@@ -1,11 +1,3 @@
-using Microsoft.Identity.Web;
-using Microsoft.Identity.Web.UI;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Press.Core;
 using Press.MongoDb;
 using Press.MongoDb.Configuration;
@@ -21,16 +13,9 @@ namespace Press.Web
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services
-                .AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
-                .AddMicrosoftIdentityWebApp(Configuration.GetSection("AzureAdB2C"));
-
-            services
-                .AddRazorPages()
-                .AddMicrosoftIdentityUI();
+            services.AddRazorPages();
 
             var mongo = Configuration.GetSection("MongoDb").Get<MongoDbOptions>();
 
@@ -41,7 +26,6 @@ namespace Press.Web
             services.AddMemoryCache();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
@@ -57,10 +41,7 @@ namespace Press.Web
             app.UseRequestLocalization("pt-BR");
 
             app.UseRouting();
-
-            app.UseAuthentication();
-            app.UseAuthorization();
-
+            
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapRazorPages();

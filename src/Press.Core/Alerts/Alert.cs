@@ -1,5 +1,3 @@
-using System;
-
 namespace Press.Core.Alerts
 {
     public class Alert

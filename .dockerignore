@@ -5,6 +5,7 @@
 !*.sln
 !/src/**
 !/tests/**
+!Directory.Build.props
 
 
 # Ignore unnecessary files inside allowed directories

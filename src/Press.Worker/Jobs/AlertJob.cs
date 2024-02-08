@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using Press.Core.Alerts;
 using Quartz;
 

@@ -8,6 +8,7 @@ namespace Press.Scrapers
         public static IServiceCollection AddScrapers(this IServiceCollection services)
         {
             return services
+                .AddHttpClient()
                 .AddTransient<IContentExtractor, ContentExtractor>()
                 .AddTransient<IPublicationProvider, Franca.PublicationProvider>()
                 .AddTransient<IPublicationProvider, SaoCarlos.PublicationProvider>()
