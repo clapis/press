@@ -15,8 +15,8 @@ namespace Press.Core
                 .AddTransient<SynchronizationService>();
 
             services
-                .AddTransient<IContentExtractor, PigExtractor>()
-                .AddTransient<IContentExtractor, SharpTextExtractor>();
+                .AddTransient<IContentExtractor, PigExtractor>();
+                // .AddTransient<IContentExtractor, SharpTextExtractor>();
 
             return services;
         }

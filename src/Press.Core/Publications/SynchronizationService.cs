@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using System.Text;
 using Microsoft.Extensions.Logging;
 
 namespace Press.Core.Publications
@@ -52,10 +53,16 @@ namespace Press.Core.Publications
 
         private async Task<string> ExtractContentsAsync(Publication publication, CancellationToken token)
         {
+            var builder = new StringBuilder();
+
+            builder.AppendLine(publication.Source.ToString());
+            
             var extractions = await Task.WhenAll(_extractors
                 .Select(extractor => extractor.ExtractAsync(publication.Url, token)));
 
-            return string.Join(" ", extractions);
+            builder.AppendJoin(" ", extractions);
+
+            return builder.ToString();
         }
     }
 }
