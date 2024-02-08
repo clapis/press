@@ -1,5 +1,6 @@
 ﻿@page
 @using Humanizer
+@using System.Globalization
 @model IndexModel
 
 @if (string.IsNullOrEmpty(Model.SearchTerm))
@@ -44,4 +45,9 @@
             <p>Sua pesquisa não encontrou nenhum documento correspondente.</p>
         }
     }
+</div>
+
+<div hidden>
+    Current Culture: @CultureInfo.CurrentCulture.Name
+    Current UI Culture: @CultureInfo.CurrentUICulture.Name
 </div>

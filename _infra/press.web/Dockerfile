@@ -14,6 +14,7 @@ WORKDIR /app
 COPY --from=build-env /build/publish .
 
 RUN apk add --no-cache icu-libs
+RUN apk add --no-cache icu-data-full
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
 RUN apk add tzdata
 
