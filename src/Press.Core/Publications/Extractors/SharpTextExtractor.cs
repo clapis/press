@@ -1,15 +1,14 @@
 using Microsoft.Extensions.Logging;
 using PdfSharpTextExtractor;
-using Press.Core.Publications;
 
-namespace Press.Scrapers
+namespace Press.Core.Publications.Extractors
 {
-    public class ContentExtractor : IContentExtractor
+    public class SharpTextExtractor : IContentExtractor
     {
         private readonly HttpClient _client;
-        private readonly ILogger<ContentExtractor> _logger;
+        private readonly ILogger<SharpTextExtractor> _logger;
 
-        public ContentExtractor(HttpClient client, ILogger<ContentExtractor> logger)
+        public SharpTextExtractor(HttpClient client, ILogger<SharpTextExtractor> logger)
         {
             _client = client;
             _logger = logger;

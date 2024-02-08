@@ -1,6 +1,4 @@
-﻿// See https://aka.ms/new-console-template for more information
-
-using Microsoft.Extensions.Logging.Abstractions;
+﻿using Microsoft.Extensions.Logging.Abstractions;
 using Press.Scrapers.Sorocaba;
 
 var provider = new PublicationProvider(NullLogger<PublicationProvider>.Instance);

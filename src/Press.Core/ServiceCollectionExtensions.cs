@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Press.Core.Alerts;
 using Press.Core.Publications;
+using Press.Core.Publications.Extractors;
 
 namespace Press.Core
 {
@@ -12,6 +13,10 @@ namespace Press.Core
                 .AddTransient<AlertService>()
                 .AddTransient<ReportService>()
                 .AddTransient<SynchronizationService>();
+
+            services
+                .AddTransient<IContentExtractor, PigExtractor>()
+                .AddTransient<IContentExtractor, SharpTextExtractor>();
 
             return services;
         }

@@ -6,20 +6,20 @@ namespace Press.Core.Publications
     public class SynchronizationService
     {
         private readonly IPublicationStore _store;
-        private readonly IContentExtractor _extractor;
+        private readonly IEnumerable<IContentExtractor> _extractors;
         private readonly IEnumerable<IPublicationProvider> _providers;
         private readonly ILogger<SynchronizationService> _logger;
 
         public SynchronizationService(
             IPublicationStore store,
-            IContentExtractor extractor,
+            IEnumerable<IContentExtractor> extractors,
             IEnumerable<IPublicationProvider> providers, 
             ILogger<SynchronizationService> logger)
         {
             _store = store;
-            _extractor = extractor;
-            _providers = providers;
             _logger = logger;
+            _providers = providers;
+            _extractors = extractors;
         }
 
         public async Task SynchronizeAsync(CancellationToken cancellationToken)
@@ -36,7 +36,7 @@ namespace Press.Core.Publications
                     continue;
 
                 // Extract contents 
-                publication.Contents = await _extractor.ExtractAsync(publication.Url, cancellationToken);
+                publication.Contents = await ExtractContentsAsync(publication, cancellationToken);
 
                 // Store the publication
                 await _store.SaveAsync(publication, cancellationToken);
@@ -48,6 +48,14 @@ namespace Press.Core.Publications
             foreach (var provider in _providers)
                 await foreach (var publication in provider.ProvideAsync(cancellationToken))
                     yield return publication;
+        }
+
+        private async Task<string> ExtractContentsAsync(Publication publication, CancellationToken token)
+        {
+            var extractions = await Task.WhenAll(_extractors
+                .Select(extractor => extractor.ExtractAsync(publication.Url, token)));
+
+            return string.Join(" ", extractions);
         }
     }
 }
