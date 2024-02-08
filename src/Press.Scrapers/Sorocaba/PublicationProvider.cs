@@ -67,12 +67,13 @@ namespace Press.Scrapers.Sorocaba
         {
             try
             {
-                var pattern = @"\/wp-content\/uploads\/(?<year>\d+)\/(?<month>\d+)\/(?<number>\d+)-(?<day>\d+)-.+\.pdf$";
+                var pattern = @"\/wp-content\/uploads\/(?<year>\d+)\/(?<month_number>\d+)\/(?<number>\d+)-(?<day>\d+)-DE-(?<month>\w+)-.+\.pdf$";
 
                 var match = Regex.Match(link, pattern);
 
                 var year = int.Parse(match.Groups["year"].Value);
-                var month = int.Parse(match.Groups["month"].Value);
+                // var month = int.Parse(match.Groups["month_digit"].Value);
+                var month = ParseMonth(match.Groups["month"].Value);
                 var day = int.Parse(match.Groups["day"].Value);
 
                 return new DateTime(year, month, day);
@@ -84,6 +85,26 @@ namespace Press.Scrapers.Sorocaba
                 return DateTime.UtcNow.Date;
             }
 
+        }
+        
+        private static int ParseMonth(string month)
+        {
+            return month.ToLower() switch
+            {
+                "janeiro" => 01,
+                "fevereiro" => 02,
+                "marco" => 03,
+                "abril" => 04,
+                "maio" => 05,
+                "junho" => 06,
+                "julho" => 07,
+                "agosto" => 08,
+                "setembro" => 09,
+                "outubro" => 10,
+                "novembro" => 11,
+                "dezembro" => 12,
+                _ => throw new ArgumentOutOfRangeException($"Cannot parse '{month}'")
+            };
         }
     }
 }
