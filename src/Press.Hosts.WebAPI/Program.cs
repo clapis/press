@@ -1,4 +1,7 @@
+using Microsoft.AspNetCore.Mvc;
 using Press.Core;
+using Press.Core.Features.Publications.GetLatestBySource;
+using Press.Core.Features.Publications.Search;
 using Press.Hosts.WebAPI.Jobs;
 using Press.Infrastructure.MongoDb;
 using Press.Infrastructure.MongoDb.Configuration;
@@ -24,6 +27,9 @@ builder.Services
     .AddSwaggerGen()
     .AddEndpointsApiExplorer();
 
+builder.Services
+    .AddHealthChecks();
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -32,23 +38,15 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+app.MapHealthChecks("/healthz");
 
+app.MapGet("/publications/search",
+    async ([FromServices] PublicationsSearchHandler handler, [FromQuery] string keyword, CancellationToken cancellationToken)
+        => await handler.HandleAsync(keyword, cancellationToken));
 
-// app.MapGet("/weatherforecast", () =>
-//     {
-//         var forecast = Enumerable.Range(1, 5).Select(index =>
-//                 new WeatherForecast
-//                 (
-//                     DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-//                     Random.Shared.Next(-20, 55),
-//                     summaries[Random.Shared.Next(summaries.Length)]
-//                 ))
-//             .ToArray();
-//         return forecast;
-//     })
-//     .WithName("GetWeatherForecast")
-//     .WithOpenApi();
+app.MapGet("/publications/latest-by-source",
+    async ([FromServices] GetLatestPublicationsBySourceHandler handler, CancellationToken cancellationToken)
+        => await handler.HandleAsync(cancellationToken));
 
 app.Run();
 
