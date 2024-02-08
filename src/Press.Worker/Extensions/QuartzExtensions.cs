@@ -27,10 +27,9 @@ namespace Press.Worker.Extensions
 
             quartz.AddTrigger(opts => opts
                 .ForJob(jobKey)
-                .WithIdentity(jobName + "-trigger")
                 .WithCronSchedule(cronSchedule)); // use the schedule from configuration
 
-            quartz.AddTrigger(opts => opts.ForJob(jobKey).StartNow());
+            // quartz.AddTrigger(opts => opts.ForJob(jobKey).StartNow());
         }
     }
 }
