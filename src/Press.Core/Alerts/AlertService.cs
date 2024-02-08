@@ -26,7 +26,7 @@ namespace Press.Core.Alerts
             {
                 var pubs = await _publicationStore.SearchAsync(alert.Term, cancellationToken);
 
-                var notifications = pubs.Where(p => p.Date > alert.LastNotification).ToList();
+                var notifications = pubs.Where(p => p.CreatedOn > alert.LastNotification).ToList();
 
                 if (!notifications.Any()) continue;
                 
@@ -34,7 +34,7 @@ namespace Press.Core.Alerts
                     
                 await _notificationService.SendAlertAsync(info, cancellationToken);
 
-                alert.LastNotification = notifications.Max(x => x.Date);
+                alert.LastNotification = notifications.Max(x => x.CreatedOn);
                     
                 await _alertStore.UpdateAsync(alert, cancellationToken);
             }

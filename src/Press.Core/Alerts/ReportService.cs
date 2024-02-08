@@ -25,12 +25,12 @@ namespace Press.Core.Alerts
             foreach (var alert in alerts)
             {
                 var pubs = await _publicationStore.SearchAsync(alert.Term, cancellationToken);
-            
-                if (pubs.Any())
-                {
-                    var info = new NotificationInfo(alert, pubs);
-                    await _notificationService.SendReportAsync(info, cancellationToken);
-                }
+
+                if (!pubs.Any()) continue;
+                
+                var info = new NotificationInfo(alert, pubs);
+                
+                await _notificationService.SendReportAsync(info, cancellationToken);
             }
         }
     }
