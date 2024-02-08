@@ -34,7 +34,7 @@ namespace Press.Scrapers.Sorocaba
             Enumerable.Range(1, 3).Select(Page);
 
         private static string Page(int page) => 
-            $"https://noticias.sorocaba.sp.gov.br/jornal/page/{page}/";
+            $"https://noticias.sorocaba.sp.gov.br/jornal-do-municipio/page/{page}/";
 
         private Task<List<string>> ScrapePageLinksAsync(string url, CancellationToken cancellationToken)
         {
@@ -51,7 +51,7 @@ namespace Press.Scrapers.Sorocaba
             var document = await context.OpenAsync(url, cancellationToken);
             
             var links = document
-                .QuerySelectorAll("#jornal-home > a")
+                .QuerySelectorAll(".content-pdf a")
                 .OfType<IHtmlAnchorElement>()
                 .Select(x => x.Href)
                 .Where(x => x.EndsWith(".pdf"))
