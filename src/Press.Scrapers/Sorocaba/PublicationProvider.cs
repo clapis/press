@@ -65,15 +65,26 @@ namespace Press.Scrapers.Sorocaba
 
         private DateTime GetDateFromLink(string link)
         {
-            var pattern = @"^http:\/\/noticias\.sorocaba\.sp\.gov\.br\/wp-content\/uploads\/(?<year>\d+)\/(?<month>\d+)\/noticias\.sorocaba\.sp\.gov\.br-(?<number>\d+)-(?<day>\d+)-.+\.pdf$";
+            try
+            {
+                var pattern =
+                    @"^http:\/\/noticias\.sorocaba\.sp\.gov\.br\/wp-content\/uploads\/(?<year>\d+)\/(?<month>\d+)\/noticias\.sorocaba\.sp\.gov\.br-(?<number>\d+)-(?<day>\d+)-.+\.pdf$";
 
-            var match = Regex.Match(link, pattern);
-            
-            var year = int.Parse(match.Groups["year"].Value);
-            var month = int.Parse(match.Groups["month"].Value);
-            var day = int.Parse(match.Groups["day"].Value);
+                var match = Regex.Match(link, pattern);
 
-            return new DateTime(year, month, day);
+                var year = int.Parse(match.Groups["year"].Value);
+                var month = int.Parse(match.Groups["month"].Value);
+                var day = int.Parse(match.Groups["day"].Value);
+
+                return new DateTime(year, month, day);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Failed to retrive date from link {link}", ex);
+                
+                return DateTime.Now.Date;
+            }
+
         }
     }
 }
