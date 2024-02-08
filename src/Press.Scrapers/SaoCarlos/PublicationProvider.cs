@@ -71,11 +71,20 @@ namespace Press.Scrapers.SaoCarlos
 
         private DateTime GetDateFromLink(string link)
         {
-            var pattern = @"\/diario_oficial_\d{4}\/DO_(?<date>\d{8})_.+\.pdf$";
+            try
+            {
+                var pattern = @"\/diario_oficial_\d{4}\/(DO_)?(?<date>[\d-]+)_.+\.pdf$";
 
-            var match = Regex.Match(link, pattern);
+                var match = Regex.Match(link, pattern);
 
-            return DateTime.ParseExact(match.Groups["date"].Value, "ddMMyyyy", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal);
+                return DateTime.ParseExact(match.Groups["date"].Value, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning($"Failed to infer date from link {link}", ex);
+
+                return DateTime.UtcNow.Date;
+            }
         }
         
         private static string MapMonth(DateTime date)

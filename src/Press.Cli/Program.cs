@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Logging.Abstractions;
-using Press.Scrapers.Sorocaba;
+using Press.Scrapers.SaoCarlos;
 
 var provider = new PublicationProvider(NullLogger<PublicationProvider>.Instance);
 

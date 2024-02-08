@@ -31,7 +31,7 @@ namespace Press.Scrapers.Sorocaba
         }
         
         private static IEnumerable<string> Pages() => 
-            Enumerable.Range(1, 3).Select(Page);
+            Enumerable.Range(1, 5).Select(Page);
 
         private static string Page(int page) => 
             $"https://noticias.sorocaba.sp.gov.br/jornal-do-municipio/page/{page}/";
@@ -80,7 +80,7 @@ namespace Press.Scrapers.Sorocaba
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Failed to retrive date from link {link}", ex);
+                _logger.LogWarning($"Failed to infer date from link {link}", ex);
                 
                 return DateTime.UtcNow.Date;
             }
