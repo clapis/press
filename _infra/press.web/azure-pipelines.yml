@@ -12,9 +12,12 @@ variables:
   
 - name: StartupProject
   value: Press.Web
+
+- name: DockerFile
+  value: ./_infra/press.web/Dockerfile
   
 - name: ContainerImage
-  value: $(Web.Image)
+  value: $(Web.Image):$(Build.BuildNumber)
   
 stages:
 - stage: Build
@@ -24,20 +27,20 @@ stages:
     displayName: Build
     steps:
       - bash: |
-          docker build -t $(ContainerImage) \
-            --build-arg StartupProject=$(StartupProject) \
-            -f ./_infra/press.web/Dockerfile \
-            .
-        displayName: Build Image
+          echo '$(Docker.PAT)' | docker login -u $(Docker.User) --password-stdin $(Docker.Registry)
 
-      - task: Docker@2
-        displayName: Publish Image
-        inputs:
-          command: push
-          repository: $(ContainerImage)
-          containerRegistry: 'Docker Hub'
-          dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
-          tags: 'latest'
+          docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+          docker buildx create --use
+
+          docker buildx build \
+            -t $(Docker.Registry)/$(ContainerImage) \
+            --build-arg StartupProject=$(StartupProject) \
+            --platform linux/arm64,linux/amd64 \
+            -f $(DockerFile) \
+            --push \
+            .
+        displayName: Build & Publish Image
           
 - stage: Deploy
   dependsOn: Build
