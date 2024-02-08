@@ -67,8 +67,7 @@ namespace Press.Scrapers.Sorocaba
         {
             try
             {
-                var pattern =
-                    @"^http:\/\/noticias\.sorocaba\.sp\.gov\.br\/wp-content\/uploads\/(?<year>\d+)\/(?<month>\d+)\/noticias\.sorocaba\.sp\.gov\.br-(?<number>\d+)-(?<day>\d+)-.+\.pdf$";
+                var pattern = @"\/wp-content\/uploads\/(?<year>\d+)\/(?<month>\d+)\/(?<number>\d+)-(?<day>\d+)-.+\.pdf$";
 
                 var match = Regex.Match(link, pattern);
 
@@ -82,7 +81,7 @@ namespace Press.Scrapers.Sorocaba
             {
                 _logger.LogError($"Failed to retrive date from link {link}", ex);
                 
-                return DateTime.Now.Date;
+                return DateTime.UtcNow.Date;
             }
 
         }
