@@ -4,7 +4,7 @@ using MongoDB.Driver;
 using Press.Core.Alerts;
 using Press.Core.Publications;
 using Press.MongoDb.Configuration;
-using Press.MongoDb.Services;
+using Press.MongoDb.Stores;
 
 namespace Press.MongoDb
 {
@@ -20,7 +20,8 @@ namespace Press.MongoDb
                 .AddMongoCollection<Publication>("publications")
                 .AddSingleton<IPublicationStore, PublicationStore>()
                 .AddMongoCollection<Alert>("alerts")
-                .AddSingleton<IAlertStore, AlertStore>();
+                .AddSingleton<IAlertStore, AlertStore>()
+                .AddHostedService<Indexes>();
 
             return services;
         }

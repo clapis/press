@@ -23,7 +23,8 @@ namespace Press.Scrapers.Sorocaba
                     yield return new Publication
                     {
                         Url = link,
-                        Date = GetDateFromLink(link)
+                        Date = GetDateFromLink(link),
+                        Source = PublicationSource.Sorocaba
                     };
                 }
             }

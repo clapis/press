@@ -2,9 +2,9 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using Press.Core.Publications;
 
-namespace Press.MongoDb.Services
+namespace Press.MongoDb.Stores
 {
-    public class PublicationStore : IPublicationStore
+    internal class PublicationStore : IPublicationStore
     {
         private readonly IMongoCollection<Publication> _publications;
 

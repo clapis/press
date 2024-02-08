@@ -5,9 +5,9 @@ using MongoDB.Bson.Serialization.Serializers;
 using Press.Core.Alerts;
 using Press.Core.Publications;
 
-namespace Press.MongoDb.Services
+namespace Press.MongoDb
 {
-    public static class BsonClassMappings
+    internal static class BsonClassMappings
     {
         public static void Configure()
         {
@@ -17,6 +17,8 @@ namespace Press.MongoDb.Services
                 map.MapIdProperty(x => x.Id)
                     .SetIdGenerator(new StringObjectIdGenerator())
                     .SetSerializer(new StringSerializer(BsonType.ObjectId));
+                map.MapMember(x => x.Source)
+                    .SetSerializer(new EnumSerializer<PublicationSource>(BsonType.String));
             });
 
             BsonClassMap.RegisterClassMap<Alert>(map =>

@@ -1,9 +1,9 @@
 using MongoDB.Driver;
 using Press.Core.Alerts;
 
-namespace Press.MongoDb.Services
+namespace Press.MongoDb.Stores
 {
-    public class AlertStore : IAlertStore
+    internal class AlertStore : IAlertStore
     {
         private readonly IMongoCollection<Alert> _alerts;
 

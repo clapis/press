@@ -23,7 +23,8 @@ namespace Press.Scrapers.Franca
                     yield return new Publication
                     {
                         Url = link,
-                        Date = date
+                        Date = date,
+                        Source = PublicationSource.Franca
                     };
                 }
             }
