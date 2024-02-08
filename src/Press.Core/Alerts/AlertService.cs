@@ -20,7 +20,6 @@ namespace Press.Core.Alerts
 
         public async Task AlertAsync(CancellationToken cancellationToken)
         {
-            var date = await _publicationStore.GetMaxDateAsync(cancellationToken);
             var alerts = await _alertStore.GetAllAsync(cancellationToken);
             
             foreach (var alert in alerts)
@@ -31,7 +30,7 @@ namespace Press.Core.Alerts
 
                 if (!notifications.Any()) continue;
                 
-                var info = new NotificationInfo(alert, notifications, date);
+                var info = new NotificationInfo(alert, notifications);
                     
                 await _notificationService.SendAlertAsync(info, cancellationToken);
 

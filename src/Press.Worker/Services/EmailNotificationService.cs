@@ -26,8 +26,6 @@ namespace Press.Worker.Services
             body.AppendLine();
             info.Publications.ForEach(pub => body.AppendLine($"{pub.Date:dd/MM/yyyy}: {pub.Url}"));
             body.AppendLine();
-            body.AppendLine($"Ultimo diário publicado em {info.LastPublicationDate.Date:dd/MM/yyyy}");
-            body.AppendLine();
             body.AppendLine("Ciao, :)");
 
             await NotifyAsync(email, subject, body.ToString(), cancellationToken);
@@ -42,8 +40,6 @@ namespace Press.Worker.Services
             body.AppendLine($"Termo '{info.Alert.Term}' encontrado em:");
             body.AppendLine();
             info.Publications.ForEach(pub => body.AppendLine($"{pub.Date:dd/MM/yyyy}: {pub.Url}"));
-            body.AppendLine();
-            body.AppendLine($"Ultimo diário publicado em {info.LastPublicationDate.Date:dd/MM/yyyy}");
             body.AppendLine();
             body.AppendLine("Ciao, :)");
 

@@ -26,8 +26,7 @@ namespace Press.MongoDb
             return services;
         }
 
-        private static IServiceCollection AddDefaultMongoClient(this IServiceCollection services,
-            string connectionString)
+        private static IServiceCollection AddDefaultMongoClient(this IServiceCollection services, string connectionString)
             => services.AddSingleton<IMongoClient>(_ => new MongoClient(connectionString));
 
         private static IServiceCollection AddMongoDatabase(this IServiceCollection services, string name)

@@ -8,5 +8,5 @@ namespace Press.Core.Alerts
         Task SendReportAsync(NotificationInfo info, CancellationToken cancellationToken);
     }
 
-    public record NotificationInfo(Alert Alert, List<Publication> Publications, DateTime LastPublicationDate);
+    public record NotificationInfo(Alert Alert, List<Publication> Publications);
 }

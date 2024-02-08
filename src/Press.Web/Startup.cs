@@ -20,7 +20,7 @@ namespace Press.Web
             var mongo = Configuration.GetSection("MongoDb").Get<MongoDbOptions>();
 
             services
-                .AddPressCore()
+                // .AddPressCore() => Design problem!
                 .AddMongoPress(mongo);
 
             services.AddMemoryCache();

@@ -14,9 +14,7 @@
             <input type="search" asp-for="SearchTerm" class="search__text form-control" aria-label="Search">
         </div>
     </form>
-    <span class="text-muted small">
-        @await Component.InvokeAsync("LastPublication")
-    </span>
+    @await Component.InvokeAsync("LastPublications")
 </div>
 
 <div>
@@ -31,12 +29,11 @@
                             <img src="https://img.icons8.com/metro/344/pdf-2.png" width="28" height="28" alt="pdf">
                         </a>
                         <div>
-                            <span class="d-block text-muted small">@publication.Date.ToLongDateString()</span>
+                            <span class="d-block text-muted small">@publication.Date.ToLongDateString() - @publication.Date.Humanize()</span>
                             <a href="@publication.Url" target="_blank">@publication.Url</a>
                         </div>
                         <div class="ml-auto">
-                            <span class="d-block small text-muted text-right">@publication.Date.ToShortDateString()</span>
-                            <span class="d-block small text-muted text-right">@publication.Date.Humanize()</span>
+                            <span class="d-block small text-muted text-right">@publication.Source</span>
                         </div>
                     </div>
                 </li>

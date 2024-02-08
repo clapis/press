@@ -1,5 +1,6 @@
 using MongoDB.Bson;
 using MongoDB.Driver;
+using MongoDB.Driver.Linq;
 using Press.Core.Publications;
 
 namespace Press.MongoDb.Stores
@@ -9,15 +10,6 @@ namespace Press.MongoDb.Stores
         private readonly IMongoCollection<Publication> _publications;
 
         public PublicationStore(IMongoCollection<Publication> publications) => _publications = publications;
-
-        public async Task<DateTime> GetMaxDateAsync(CancellationToken cancellationToken)
-        {
-            return await _publications.Find(x => true)
-                .SortByDescending(x => x.Date)
-                .Limit(1)
-                .Project(x => x.Date)
-                .FirstOrDefaultAsync(cancellationToken);
-        }
 
         public async Task<List<string>> GetAllUrlsAsync(CancellationToken cancellationToken)
         {
@@ -44,6 +36,22 @@ namespace Press.MongoDb.Stores
                 .Limit(15)
                 .Project<Publication>(Builders<Publication>.Projection.Exclude(f => f.Contents))
                 .ToListAsync(cancellationToken);
+        }
+
+        public Task<List<Publication>> GetLatestPublicationsBySourceAsync(CancellationToken cancellationToken)
+        {
+            return _publications
+                .AsQueryable()
+                .OrderByDescending(x => x.Date)
+                .GroupBy(x => x.Source)
+                .Select(g => new
+                {
+                    Source = g.Key,
+                    LastPublication = g.First()
+                })
+                .Select(x => x.LastPublication)
+                .ToListAsync(cancellationToken);
+
         }
     }
 }

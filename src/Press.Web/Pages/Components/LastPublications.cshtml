@@ -1,0 +1,23 @@
+@using Humanizer
+@using Press.Core.Publications
+@model List<Press.Core.Publications.Publication>
+
+<div class="text-muted small">
+    @foreach (var publication in Model)
+    {
+        <div>
+            @publication.Source: @publication.Date.Humanize()
+            <a href="@GetSourceUrl(publication.Source)" target="_blank"> ↗</a>
+        </div>
+    }
+</div>
+
+@{
+    string GetSourceUrl(PublicationSource source) => source switch 
+    {
+        PublicationSource.Franca => "https://www.franca.sp.gov.br/pmf-diario",
+        PublicationSource.Sorocaba => "https://noticias.sorocaba.sp.gov.br/jornal/",
+        PublicationSource.SaoCarlos => "http://www.saocarlos.sp.gov.br/index.php/diario-oficial.html",
+        _ => string.Empty
+    };
+}
