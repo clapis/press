@@ -1,0 +1,50 @@
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+resources:
+- repo: self
+
+variables:
+- group: press
+  
+- name: StartupProject
+  value: Press.Worker
+  
+- name: ContainerImage
+  value: $(Worker.Image)
+    
+stages:
+- stage: Build
+  displayName: Build
+  jobs:
+  - job: Build
+    displayName: Build
+    steps:
+      - bash: |
+          docker build -t $(ContainerImage) \
+            --build-arg StartupProject=$(StartupProject) \
+            -f ./_infra/press.worker/Dockerfile \
+            .
+        displayName: Build Image
+
+      - task: Docker@2
+        displayName: Publish Image
+        inputs:
+          command: push
+          repository: $(ContainerImage)
+          containerRegistry: 'Docker Hub'
+          dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
+          tags: 'latest'
+          
+- stage: Deploy
+  dependsOn: Build
+  jobs:
+    - job: Captain
+      steps:
+      - bash: |
+          sudo npm install -g caprover
+          caprover deploy -u $(Worker.Captain.Server) -p $(Worker.Captain.Password) -a $(Worker.Captain.App) -i $(ContainerImage)
+        displayName: Deploy to Captain
