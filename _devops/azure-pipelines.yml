@@ -1,0 +1,47 @@
+trigger:
+  - main
+
+pool:
+  vmImage: ubuntu-latest
+
+resources:
+  - repo: self
+
+variables:
+  - group: press
+
+  - name: DockerFile
+    value: ./_devops/Dockerfile
+
+  - name: ContainerImage
+    value: $(Docker.User)/press-webapi:$(Build.BuildNumber)
+
+stages:
+  - stage: Build
+    displayName: Build
+    jobs:
+      - job: Build
+        displayName: Build
+        steps:
+          - bash: |
+              echo '$(Docker.PAT)' | docker login -u $(Docker.User) --password-stdin $(Docker.Registry)
+              
+              docker buildx create --use
+              
+              docker buildx build \
+                -t $(Docker.Registry)/$(ContainerImage) \
+                --platform linux/arm64,linux/amd64 \
+                -f $(DockerFile) \
+                --push \
+                .
+            displayName: Build & Publish Image
+
+  - stage: Deploy
+    dependsOn: Build
+    jobs:
+      - job: Captain
+        steps:
+          - bash: |
+              sudo npm install -g caprover
+              caprover deploy -u $(Captain.Server) -p $(Captain.Password) -a $(Captain.App) -i $(ContainerImage)
+            displayName: Deploy to Captain

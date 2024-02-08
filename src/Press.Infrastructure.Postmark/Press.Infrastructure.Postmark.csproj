@@ -1,0 +1,11 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    
+    <ItemGroup>
+        <PackageReference Include="Postmark" Version="4.7.10" />
+    </ItemGroup>
+    
+    <ItemGroup>
+      <ProjectReference Include="..\Press.Core\Press.Core.csproj" />
+    </ItemGroup>
+    
+</Project>

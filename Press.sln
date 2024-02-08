@@ -4,31 +4,23 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Press.Core", "src\Press.Cor
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{EF359897-9873-419F-A992-5C79125A727E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Press.MongoDb", "src\Press.MongoDb\Press.MongoDb.csproj", "{44DFA17B-C63B-486A-B233-53AD3A6B09CE}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Press.Worker", "src\Press.Worker\Press.Worker.csproj", "{0CC86068-508B-4F1C-B379-5B1D1ADD9592}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Press.Web", "src\Press.Web\Press.Web.csproj", "{D2194D38-C9F5-4AEE-9A33-3B1324C949D2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Press.Infrastructure.MongoDb", "src\Press.Infrastructure.MongoDb\Press.Infrastructure.MongoDb.csproj", "{44DFA17B-C63B-486A-B233-53AD3A6B09CE}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{17B323A9-B850-4E93-A2A4-A35DDFFCE2C9}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_infra", "_infra", "{E171CF47-DE19-474C-B2A1-AEC2C46B6E46}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Press.Infrastructure.Scrapers", "src\Press.Infrastructure.Scrapers\Press.Infrastructure.Scrapers.csproj", "{B22CE48D-AD3C-4BA0-B685-4D607651F454}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "press.web", "press.web", "{4996AF55-9F55-4349-9F2D-CC1F42E0A02E}"
-ProjectSection(SolutionItems) = preProject
-	_infra\press.web\azure-pipelines.yml = _infra\press.web\azure-pipelines.yml
-	_infra\press.web\Dockerfile = _infra\press.web\Dockerfile
-EndProjectSection
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Press.Hosts.WebAPI", "src\Press.Hosts.WebAPI\Press.Hosts.WebAPI.csproj", "{A8DA45E4-BB95-451C-8C75-4E69EF42CFB3}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "press.worker", "press.worker", "{AA71D692-18A8-45A0-A5AA-11D4D3F4FD9A}"
-ProjectSection(SolutionItems) = preProject
-	_infra\press.worker\azure-pipelines.yml = _infra\press.worker\azure-pipelines.yml
-	_infra\press.worker\Dockerfile = _infra\press.worker\Dockerfile
-EndProjectSection
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Press.Hosts.Cli", "src\Press.Hosts.Cli\Press.Hosts.Cli.csproj", "{9B83805E-841F-4E5A-9933-AFBF004F3FB6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Press.Scrapers", "src\Press.Scrapers\Press.Scrapers.csproj", "{B22CE48D-AD3C-4BA0-B685-4D607651F454}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Press.Infrastructure.Postmark", "src\Press.Infrastructure.Postmark\Press.Infrastructure.Postmark.csproj", "{E0F31348-2C08-4222-9308-312248E56C27}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Press.Cli", "src\Press.Cli\Press.Cli.csproj", "{5AB91728-2284-4D25-A2DE-7DF5DC09627E}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_devops", "_devops", "{B74C7065-8CC3-4D8B-8DC1-4608E0CEB078}"
+	ProjectSection(SolutionItems) = preProject
+		_devops\Dockerfile = _devops\Dockerfile
+		_devops\azure-pipelines.yml = _devops\azure-pipelines.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -44,31 +36,29 @@ Global
 		{44DFA17B-C63B-486A-B233-53AD3A6B09CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{44DFA17B-C63B-486A-B233-53AD3A6B09CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{44DFA17B-C63B-486A-B233-53AD3A6B09CE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0CC86068-508B-4F1C-B379-5B1D1ADD9592}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0CC86068-508B-4F1C-B379-5B1D1ADD9592}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0CC86068-508B-4F1C-B379-5B1D1ADD9592}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0CC86068-508B-4F1C-B379-5B1D1ADD9592}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D2194D38-C9F5-4AEE-9A33-3B1324C949D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D2194D38-C9F5-4AEE-9A33-3B1324C949D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D2194D38-C9F5-4AEE-9A33-3B1324C949D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D2194D38-C9F5-4AEE-9A33-3B1324C949D2}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B22CE48D-AD3C-4BA0-B685-4D607651F454}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B22CE48D-AD3C-4BA0-B685-4D607651F454}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B22CE48D-AD3C-4BA0-B685-4D607651F454}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B22CE48D-AD3C-4BA0-B685-4D607651F454}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5AB91728-2284-4D25-A2DE-7DF5DC09627E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5AB91728-2284-4D25-A2DE-7DF5DC09627E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5AB91728-2284-4D25-A2DE-7DF5DC09627E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5AB91728-2284-4D25-A2DE-7DF5DC09627E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A8DA45E4-BB95-451C-8C75-4E69EF42CFB3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A8DA45E4-BB95-451C-8C75-4E69EF42CFB3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A8DA45E4-BB95-451C-8C75-4E69EF42CFB3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A8DA45E4-BB95-451C-8C75-4E69EF42CFB3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9B83805E-841F-4E5A-9933-AFBF004F3FB6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B83805E-841F-4E5A-9933-AFBF004F3FB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B83805E-841F-4E5A-9933-AFBF004F3FB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B83805E-841F-4E5A-9933-AFBF004F3FB6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E0F31348-2C08-4222-9308-312248E56C27}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E0F31348-2C08-4222-9308-312248E56C27}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E0F31348-2C08-4222-9308-312248E56C27}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E0F31348-2C08-4222-9308-312248E56C27}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{C5B47203-BEE9-4307-9990-5397518199CD} = {EF359897-9873-419F-A992-5C79125A727E}
 		{44DFA17B-C63B-486A-B233-53AD3A6B09CE} = {EF359897-9873-419F-A992-5C79125A727E}
-		{0CC86068-508B-4F1C-B379-5B1D1ADD9592} = {EF359897-9873-419F-A992-5C79125A727E}
-		{D2194D38-C9F5-4AEE-9A33-3B1324C949D2} = {EF359897-9873-419F-A992-5C79125A727E}
-		{4996AF55-9F55-4349-9F2D-CC1F42E0A02E} = {E171CF47-DE19-474C-B2A1-AEC2C46B6E46}
-		{AA71D692-18A8-45A0-A5AA-11D4D3F4FD9A} = {E171CF47-DE19-474C-B2A1-AEC2C46B6E46}
 		{B22CE48D-AD3C-4BA0-B685-4D607651F454} = {EF359897-9873-419F-A992-5C79125A727E}
-		{5AB91728-2284-4D25-A2DE-7DF5DC09627E} = {EF359897-9873-419F-A992-5C79125A727E}
+		{A8DA45E4-BB95-451C-8C75-4E69EF42CFB3} = {EF359897-9873-419F-A992-5C79125A727E}
+		{9B83805E-841F-4E5A-9933-AFBF004F3FB6} = {EF359897-9873-419F-A992-5C79125A727E}
+		{E0F31348-2C08-4222-9308-312248E56C27} = {EF359897-9873-419F-A992-5C79125A727E}
 	EndGlobalSection
 EndGlobal

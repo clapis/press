@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.0" />
+        <PackageReference Include="MongoDB.Driver" Version="2.23.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Press.Core\Press.Core.csproj"/>
+    </ItemGroup>
+
+</Project>
