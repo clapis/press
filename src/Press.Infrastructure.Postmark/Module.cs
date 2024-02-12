@@ -7,7 +7,7 @@ namespace Press.Infrastructure.Postmark;
 
 public static class Module
 {
-    public static IServiceCollection AddPostMark(this IServiceCollection services, PostmarkSettings settings)
+    public static IServiceCollection AddPostmark(this IServiceCollection services, PostmarkSettings settings)
     {
         services.AddSingleton(settings);
 

@@ -1,3 +1,4 @@
+using Grafana.OpenTelemetry;
 using Microsoft.AspNetCore.Mvc;
 using Press.Core;
 using Press.Core.Features.Publications.GetLatestBySource;
@@ -10,9 +11,6 @@ using Press.Infrastructure.Postmark.Configuration;
 using Press.Infrastructure.Scrapers;
 
 var builder = WebApplication.CreateBuilder(args);
-    
-builder.Logging
-    .AddSeq(builder.Configuration.GetSection("Seq"));
 
 T GetSettings<T>(string key) => builder.Configuration.GetRequiredSection(key).Get<T>()!;
 
@@ -21,14 +19,22 @@ builder.Services
     .AddScrapers()
     .AddQuartzJobs()
     .AddMongoDb(GetSettings<MongoDbSettings>("MongoDb"))
-    .AddPostMark(GetSettings<PostmarkSettings>("Postmark"));
+    .AddPostmark(GetSettings<PostmarkSettings>("Postmark"));
+
+builder.Services
+    .AddHealthChecks();
+
+builder.Logging
+    .AddSeq(builder.Configuration.GetSection("Seq"));
+
+builder.Services.AddOpenTelemetry()
+    .WithMetrics(x => x.UseGrafana())
+    .WithTracing(x => x.UseGrafana()
+        .AddSource("MongoDB.Driver.Core.Extensions.DiagnosticSources"));
 
 builder.Services
     .AddSwaggerGen()
     .AddEndpointsApiExplorer();
-
-builder.Services
-    .AddHealthChecks();
 
 var app = builder.Build();
 
@@ -49,5 +55,3 @@ app.MapGet("/publications/latest-by-source",
         => await handler.HandleAsync(cancellationToken));
 
 app.Run();
-
-

@@ -1,6 +1,6 @@
-﻿using System.Security.Authentication;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
+using MongoDB.Driver.Core.Extensions.DiagnosticSources;
 using Press.Core.Domain;
 using Press.Core.Infrastructure.Data;
 using Press.Infrastructure.MongoDb.Configuration;
@@ -15,7 +15,7 @@ public static class Module
         BsonClassMappings.Configure();
 
         services
-            .AddDefaultMongoClient(settings.ConnectionString)
+            .AddMongoClient(settings.ConnectionString)
             .AddMongoDatabase("press");
 
         services
@@ -31,12 +31,7 @@ public static class Module
 
         return services;
     }
-
-    private static IServiceCollection AddDefaultMongoClient(this IServiceCollection services, string connectionString)
-    {
-        return services.AddSingleton<IMongoClient>(_ => new MongoClient(connectionString));
-    }
-
+    
     private static IServiceCollection AddMongoDatabase(this IServiceCollection services, string name)
     {
         return services.AddSingleton(sp => sp.GetRequiredService<IMongoClient>().GetDatabase(name));
@@ -46,20 +41,14 @@ public static class Module
     {
         return services.AddSingleton(sp => sp.GetRequiredService<IMongoDatabase>().GetCollection<T>(name));
     }
-
-
+    
     private static IServiceCollection AddMongoClient(this IServiceCollection services, string connectionString)
     {
         return services.AddSingleton<IMongoClient>(_ =>
         {
             var settings = MongoClientSettings.FromConnectionString(connectionString);
 
-            settings.SslSettings = new SslSettings { EnabledSslProtocols = SslProtocols.Tls12 };
-            settings.ReadPreference = ReadPreference.SecondaryPreferred;
-            settings.WriteConcern = WriteConcern.Acknowledged;
-            settings.ReadConcern = ReadConcern.Local;
-            settings.RetryWrites = true;
-            settings.RetryReads = true;
+            settings.ClusterConfigurator = cb => cb.Subscribe(new DiagnosticsActivityEventSubscriber());
 
             return new MongoClient(settings);
         });
