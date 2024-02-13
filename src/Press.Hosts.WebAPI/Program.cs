@@ -1,9 +1,9 @@
-using Grafana.OpenTelemetry;
 using Microsoft.AspNetCore.Mvc;
 using Press.Core;
 using Press.Core.Features.Publications.GetLatestBySource;
 using Press.Core.Features.Publications.Search;
 using Press.Hosts.WebAPI.Jobs;
+using Press.Hosts.WebAPI.OpenTelemetry;
 using Press.Infrastructure.MongoDb;
 using Press.Infrastructure.MongoDb.Configuration;
 using Press.Infrastructure.Postmark;
@@ -21,16 +21,16 @@ builder.Services
     .AddMongoDb(GetSettings<MongoDbSettings>("MongoDb"))
     .AddPostmark(GetSettings<PostmarkSettings>("Postmark"));
 
-builder.Services
-    .AddHealthChecks();
-
 builder.Logging
     .AddSeq(builder.Configuration.GetSection("Seq"));
 
-builder.Services.AddOpenTelemetry()
-    .WithMetrics(x => x.UseGrafana())
-    .WithTracing(x => x.UseGrafana()
-        .AddSource("MongoDB.Driver.Core.Extensions.DiagnosticSources"));
+builder.Services
+    .AddOpenTelemetry()
+    .ConfigureInstrumentation()
+    .UseGrafanaCloudExporter(builder.Configuration.GetSection("Grafana"));
+
+builder.Services
+    .AddHealthChecks();
 
 builder.Services
     .AddSwaggerGen()

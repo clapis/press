@@ -48,7 +48,12 @@ public static class Module
         {
             var settings = MongoClientSettings.FromConnectionString(connectionString);
 
-            settings.ClusterConfigurator = cb => cb.Subscribe(new DiagnosticsActivityEventSubscriber());
+            var subscriber = new DiagnosticsActivityEventSubscriber(new()
+            {
+                CaptureCommandText = true
+            });
+
+            settings.ClusterConfigurator = cb => cb.Subscribe(subscriber);
 
             return new MongoClient(settings);
         });
