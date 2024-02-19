@@ -21,13 +21,8 @@ builder.Services
     .AddMongoDb(GetSettings<MongoDbSettings>("MongoDb"))
     .AddPostmark(GetSettings<PostmarkSettings>("Postmark"));
 
-builder.Logging
-    .AddSeq(builder.Configuration.GetSection("Seq"));
-
 builder.Services
-    .AddOpenTelemetry()
-    .ConfigureInstrumentation()
-    .UseGrafanaCloudExporter(builder.Configuration.GetSection("Grafana"));
+    .AddOpenTelemetry(GetSettings<GrafanaCloudOptions>("Grafana"));
 
 builder.Services
     .AddHealthChecks();

@@ -1,6 +1,5 @@
-using Microsoft.Extensions.Options;
-using OpenTelemetry;
 using OpenTelemetry.Exporter;
+using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 
@@ -8,34 +7,32 @@ namespace Press.Hosts.WebAPI.OpenTelemetry;
 
 public static class GrafanaCloudExtensions
 {
+    private const string PathExtensionLogs = "logs";
     private const string PathExtensionTraces = "traces";
     private const string PathExtensionMetrics = "metrics";
 
-    public static OpenTelemetryBuilder UseGrafanaCloudExporter(this OpenTelemetryBuilder builder, IConfiguration configuration)
+    public static IServiceCollection ConfigureGrafanaCloudExporter(this IServiceCollection services, GrafanaCloudOptions grafana)
     {
-        builder.Services.Configure<GrafanaCloudOptions>(configuration);
-        
-        builder.Services
-            .AddOptions<OtlpExporterOptions>()
-            .Configure<IOptions<GrafanaCloudOptions>>((exporter, grafana) =>
+        services
+            .Configure<OtlpExporterOptions>(options => 
             {
-                exporter.Endpoint = grafana.Value.Endpoint;
-                exporter.Protocol = OtlpExportProtocol.HttpProtobuf;
-                exporter.Headers = BuildAuthorizationHeader(grafana.Value);
+                options.Endpoint = grafana.Endpoint;
+                options.Protocol = OtlpExportProtocol.HttpProtobuf;
+                options.Headers = BuildAuthorizationHeader(grafana);
             });
-        
-        builder
-            .WithTracing(x => x.AddGrafanaCloudExporter())
-            .WithMetrics(x => x.AddGrafanaCloudExporter());
 
-        return builder;
+        return services;
     }
+    
+    public static OpenTelemetryLoggerOptions AddGrafanaCloudExporter(this OpenTelemetryLoggerOptions options)
+        => options.AddOtlpExporter(opts
+            => opts.Endpoint = new Uri(opts.Endpoint, PathExtensionLogs));
 
-    private static MeterProviderBuilder AddGrafanaCloudExporter(this MeterProviderBuilder builder) 
+    public static MeterProviderBuilder AddGrafanaCloudExporter(this MeterProviderBuilder builder) 
         => builder.AddOtlpExporter(opts 
             => opts.Endpoint = new Uri(opts.Endpoint, PathExtensionMetrics));
 
-    private static TracerProviderBuilder AddGrafanaCloudExporter(this TracerProviderBuilder builder)
+    public static TracerProviderBuilder AddGrafanaCloudExporter(this TracerProviderBuilder builder)
         => builder.AddOtlpExporter(opts
             => opts.Endpoint = new Uri(opts.Endpoint, PathExtensionTraces));
 

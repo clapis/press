@@ -5,9 +5,3 @@ services:
     image: mongo
     ports:
       - "27017:27017"
-  seq:
-    image: datalust/seq:latest
-    ports:
-      - "5341:80"
-    environment:
-      - ACCEPT_EULA=Y
