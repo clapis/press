@@ -1,3 +1,4 @@
+using MediatR;
 using Press.Core.Infrastructure;
 using Press.Core.Infrastructure.Data;
 
@@ -7,8 +8,9 @@ public class ReportHandler(
     IAlertStore alertStore,
     IPublicationStore publicationStore,
     INotificationService notificationService)
+    : IRequestHandler<ReportRequest>
 {
-    public async Task HandleAsync(CancellationToken cancellationToken)
+    public async Task Handle(ReportRequest request, CancellationToken cancellationToken)
     {
         var alerts = await alertStore.GetAllAsync(cancellationToken);
 

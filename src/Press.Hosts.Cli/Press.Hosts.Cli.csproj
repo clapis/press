@@ -4,4 +4,21 @@
         <OutputType>Exe</OutputType>
     </PropertyGroup>
 
+    <ItemGroup>
+      <PackageReference Include="System.CommandLine.Hosting" Version="0.4.0-alpha.22272.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Press.Core\Press.Core.csproj" />
+      <ProjectReference Include="..\Press.Infrastructure.MongoDb\Press.Infrastructure.MongoDb.csproj" />
+      <ProjectReference Include="..\Press.Infrastructure.Postmark\Press.Infrastructure.Postmark.csproj" />
+      <ProjectReference Include="..\Press.Infrastructure.Scrapers\Press.Infrastructure.Scrapers.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Content Include="./appsettings.json">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
+    
 </Project>

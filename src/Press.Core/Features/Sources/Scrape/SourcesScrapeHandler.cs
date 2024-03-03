@@ -1,5 +1,6 @@
 using System.Runtime.CompilerServices;
 using System.Text;
+using MediatR;
 using Press.Core.Domain;
 using Press.Core.Features.Sources.Scrape.Extractors;
 using Press.Core.Infrastructure.Data;
@@ -10,9 +11,10 @@ namespace Press.Core.Features.Sources.Scrape;
 public class SourcesScrapeHandler(
     IPublicationStore store,
     IEnumerable<IPublicationProvider> providers,
-    IEnumerable<IPdfContentExtractor> extractors)
+    IEnumerable<IPdfContentExtractor> extractors) 
+    : IRequestHandler<SourcesScrapeRequest>
 {
-    public async Task HandleAsync(CancellationToken cancellationToken)
+    public async Task Handle(SourcesScrapeRequest request, CancellationToken cancellationToken)
     {
         // Get all stored publication urls, so we just download new publications
         var urls = await store.GetAllUrlsAsync(cancellationToken);

@@ -1,10 +1,12 @@
+using MediatR;
 using Press.Core.Domain;
 using Press.Core.Infrastructure.Data;
 
 namespace Press.Core.Features.Publications.Search;
 
-public class PublicationsSearchHandler(IPublicationStore store)
+public class PublicationsSearchHandler(IPublicationStore store) 
+    : IRequestHandler<PublicationsSearchRequest, List<Publication>>
 {
-    public async Task<List<Publication>> HandleAsync(string keyword, CancellationToken cancellationToken) 
-        => await store.SearchAsync(keyword, cancellationToken);
+    public async Task<List<Publication>> Handle(PublicationsSearchRequest request, CancellationToken cancellationToken) 
+        => await store.SearchAsync(request.Query, cancellationToken);
 }

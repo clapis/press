@@ -1,3 +1,4 @@
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Press.Core;
 using Press.Core.Features.Publications.GetLatestBySource;
@@ -42,11 +43,11 @@ if (app.Environment.IsDevelopment())
 app.MapHealthChecks("/healthz");
 
 app.MapGet("/publications/search",
-    async ([FromServices] PublicationsSearchHandler handler, [FromQuery] string keyword, CancellationToken cancellationToken)
-        => await handler.HandleAsync(keyword, cancellationToken));
+    async ([FromServices] IMediator mediator, [FromQuery(Name = "q")] string query, CancellationToken cancellationToken)
+        => await mediator.Send(new PublicationsSearchRequest(query), cancellationToken));
 
 app.MapGet("/publications/latest-by-source",
-    async ([FromServices] GetLatestPublicationsBySourceHandler handler, CancellationToken cancellationToken)
-        => await handler.HandleAsync(cancellationToken));
+    async ([FromServices] IMediator mediator, CancellationToken cancellationToken)
+        => await mediator.Send(new GetLatestPublicationsBySourceRequest(), cancellationToken));
 
 app.Run();

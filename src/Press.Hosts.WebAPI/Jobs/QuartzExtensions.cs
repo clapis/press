@@ -1,3 +1,6 @@
+using Press.Core.Features.Alerts.Alert;
+using Press.Core.Features.Alerts.Report;
+using Press.Core.Features.Sources.Scrape;
 using Quartz;
 
 namespace Press.Hosts.WebAPI.Jobs;
@@ -8,9 +11,9 @@ public static class QuartzExtensions
     {
         services.AddQuartz(quartz =>
         {
-            quartz.AddJobAndTrigger<ScrapeJob>("0 0 3/4 * * ?");
-            quartz.AddJobAndTrigger<AlertJob>("0 10 3/4 * * ?");
-            quartz.AddJobAndTrigger<ReportJob>("0 0 12 ? * SAT");
+            quartz.AddJobAndTrigger<MediatrJob<AlertRequest>>("0 10 3/4 * * ?");
+            quartz.AddJobAndTrigger<MediatrJob<ReportRequest>>("0 0 12 ? * SAT");
+            quartz.AddJobAndTrigger<MediatrJob<SourcesScrapeRequest>>("0 0 3/4 * * ?");
         });
 
         services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
@@ -23,7 +26,7 @@ public static class QuartzExtensions
         string schedule)
         where T : IJob
     {
-        var key = new JobKey(typeof(T).Name);
+        var key = new JobKey(typeof(T).FullName);
         quartz.AddJob<T>(opts => opts.WithIdentity(key));
 
         quartz.AddTrigger(opts => opts
