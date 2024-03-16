@@ -1,4 +1,5 @@
 using Press.Core.Features.Notifications.Alert;
+using Press.Core.Features.Notifications.Monitor;
 using Press.Core.Features.Notifications.Report;
 using Press.Core.Features.Sources.Scrape;
 using Quartz;
@@ -13,6 +14,7 @@ public static class QuartzExtensions
         {
             quartz.AddJobAndTrigger<MediatrJob<AlertRequest>>("0 10 3/4 * * ?");
             quartz.AddJobAndTrigger<MediatrJob<ReportRequest>>("0 0 12 ? * SAT");
+            quartz.AddJobAndTrigger<MediatrJob<MonitorRequest>>("0 0 12 * * ?");
             quartz.AddJobAndTrigger<MediatrJob<SourcesScrapeRequest>>("0 0 3/4 * * ?");
         });
 

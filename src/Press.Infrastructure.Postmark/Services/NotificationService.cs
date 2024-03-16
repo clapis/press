@@ -56,6 +56,20 @@ public class NotificationService : INotificationService
         await NotifyAsync(email, subject, body.ToString(), cancellationToken);
     }
 
+    public async Task SendMonitorAsync(List<Publication> publications, CancellationToken cancellationToken)
+    {
+        var subject = "Atraso";
+
+        var body = new StringBuilder();
+        body.AppendLine("Últimas:");
+        body.AppendLine();
+        publications.ForEach(pub => body.AppendLine($"{pub.Date:dd/MM/yyyy}: {pub.Url}"));
+        body.AppendLine();
+        body.AppendLine("Ciao, :)");
+
+        await NotifyAsync(_settings.Sender, subject, body.ToString(), cancellationToken);
+    }
+
     private async Task NotifyAsync(string email, string subject, string body, CancellationToken cancellationToken)
     {
         var msg = new PostmarkMessage
