@@ -1,5 +1,5 @@
-using Press.Core.Features.Alerts.Alert;
-using Press.Core.Features.Alerts.Report;
+using Press.Core.Features.Notifications.Alert;
+using Press.Core.Features.Notifications.Report;
 using Press.Core.Features.Sources.Scrape;
 using Quartz;
 

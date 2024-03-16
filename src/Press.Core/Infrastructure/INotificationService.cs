@@ -4,8 +4,6 @@ namespace Press.Core.Infrastructure;
 
 public interface INotificationService
 {
-    Task SendAlertAsync(NotificationInfo info, CancellationToken cancellationToken);
-    Task SendReportAsync(NotificationInfo info, CancellationToken cancellationToken);
+    Task SendAlertAsync(Alert alert, List<Publication> publications, CancellationToken cancellationToken);
+    Task SendReportAsync(string email, Dictionary<Alert, List<Publication>> report, CancellationToken cancellationToken);
 }
-
-public record NotificationInfo(Alert Alert, List<Publication> Publications);

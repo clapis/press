@@ -2,7 +2,7 @@ using MediatR;
 using Press.Core.Infrastructure;
 using Press.Core.Infrastructure.Data;
 
-namespace Press.Core.Features.Alerts.Alert;
+namespace Press.Core.Features.Notifications.Alert;
 
 public class AlertHandler(
     IAlertStore alertStore,
@@ -22,9 +22,7 @@ public class AlertHandler(
 
             if (!notifications.Any()) continue;
 
-            var info = new NotificationInfo(alert, notifications);
-
-            await notificationService.SendAlertAsync(info, cancellationToken);
+            await notificationService.SendAlertAsync(alert, pubs, cancellationToken);
 
             alert.LastNotification = notifications.Max(x => x.CreatedOn);
 

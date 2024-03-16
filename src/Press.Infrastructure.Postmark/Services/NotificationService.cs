@@ -1,5 +1,6 @@
 using System.Text;
 using PostmarkDotNet;
+using Press.Core.Domain;
 using Press.Core.Infrastructure;
 using Press.Infrastructure.Postmark.Configuration;
 
@@ -16,30 +17,39 @@ public class NotificationService : INotificationService
         _client = new PostmarkClient(_settings.ApiToken);
     }
 
-    public async Task SendAlertAsync(NotificationInfo info, CancellationToken cancellationToken)
+    public async Task SendAlertAsync(Alert alert, List<Publication> publications, CancellationToken cancellationToken)
     {
-        var email = info.Alert.NotifyEmail;
-        var subject = $"Alerta: {info.Alert.Term}";
+        var email = alert.NotifyEmail;
+        var subject = $"Alerta: {alert.Term}";
 
         var body = new StringBuilder();
-        body.AppendLine($"Termo '{info.Alert.Term}' encontrado em:");
+        body.AppendLine($"Termo '{alert.Term}' encontrado em:");
         body.AppendLine();
-        info.Publications.ForEach(pub => body.AppendLine($"{pub.Date:dd/MM/yyyy}: {pub.Url}"));
+        publications.ForEach(pub => body.AppendLine($"{pub.Date:dd/MM/yyyy}: {pub.Url}"));
         body.AppendLine();
         body.AppendLine("Ciao, :)");
 
         await NotifyAsync(email, subject, body.ToString(), cancellationToken);
     }
 
-    public async Task SendReportAsync(NotificationInfo info, CancellationToken cancellationToken)
+    public async Task SendReportAsync(string email, Dictionary<Alert, List<Publication>> report, CancellationToken cancellationToken)
     {
-        var email = info.Alert.NotifyEmail;
-        var subject = $"Resumo semanal: {info.Alert.Term}";
+        var subject = "Resumo semanal";
 
         var body = new StringBuilder();
-        body.AppendLine($"Termo '{info.Alert.Term}' encontrado em:");
+
+        body.AppendLine("Últimos resultados encontrados para os termos:");
         body.AppendLine();
-        info.Publications.ForEach(pub => body.AppendLine($"{pub.Date:dd/MM/yyyy}: {pub.Url}"));
+
+        foreach (var (alert, publications) in report)
+        {
+            body.AppendLine($"## {alert.Term}");
+            body.AppendLine();
+            publications.ForEach(pub => body.AppendLine($"{pub.Date:dd/MM/yyyy}: {pub.Url}"));
+            body.AppendLine();
+            body.AppendLine();
+        }
+        
         body.AppendLine();
         body.AppendLine("Ciao, :)");
 
