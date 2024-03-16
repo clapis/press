@@ -1,5 +1,4 @@
-using System.Globalization;
-using System.Text.RegularExpressions;
+using System.Runtime.CompilerServices;
 using AngleSharp;
 using AngleSharp.Html.Dom;
 using Microsoft.Extensions.Logging;
@@ -11,7 +10,8 @@ namespace Press.Infrastructure.Scrapers.SaoCarlos;
 
 public class PublicationProvider(ILogger<PublicationProvider> logger) : IPublicationProvider
 {
-    public async IAsyncEnumerable<Publication> ProvideAsync(CancellationToken cancellationToken)
+    public async IAsyncEnumerable<Publication> ProvideAsync(
+        [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         foreach (var page in Pages())
         {
@@ -21,7 +21,7 @@ public class PublicationProvider(ILogger<PublicationProvider> logger) : IPublica
                 yield return new Publication
                 {
                     Url = link,
-                    Date = GetDateFromLink(link),
+                    Date = DateTime.UtcNow.Date,
                     Source = PublicationSource.SaoCarlos
                 };
         }
@@ -34,18 +34,15 @@ public class PublicationProvider(ILogger<PublicationProvider> logger) : IPublica
         yield return Page(DateTime.Today.AddMonths(-1));
     }
 
-    private static string Page(DateTime date)
-    {
-        return
-            $"http://www.saocarlos.sp.gov.br/index.php/diario-oficial-{date.Year}/diario-oficial-{MapMonth(date)}-{date.Year}.html";
-    }
+    private static string Page(DateTime date) 
+        => $"http://www.saocarlos.sp.gov.br/index.php/diario-oficial-{date.Year}/diario-oficial-{MapMonth(date)}-{date.Year}.html";
 
     private Task<List<string>> ScrapePageLinksAsync(string url, CancellationToken cancellationToken)
     {
         return Policy
             .HandleResult<List<string>>(links => links.Count == 0)
             .WaitAndRetryAsync(3, i => TimeSpan.FromSeconds(2 * i),
-                (result, span) => logger.LogInformation("Retrying.."))
+                (_, _) => logger.LogWarning("No links founds at {Url}, retrying..", url))
             .ExecuteAsync(async () => await ScrapePageLinksCoreAsync(url, cancellationToken));
     }
 
@@ -63,31 +60,10 @@ public class PublicationProvider(ILogger<PublicationProvider> logger) : IPublica
             .Where(x => x.EndsWith(".pdf"))
             .Distinct()
             .ToList();
-
-        logger.LogInformation("Found {LinksCount} links in page {Page}", links.Count, url);
-
+        
         return links;
     }
-
-    private DateTime GetDateFromLink(string link)
-    {
-        try
-        {
-            var pattern = @"\/diario_oficial_\d{4}\/(DO_)?(?<date>[\d-]+)_.+\.pdf$";
-
-            var match = Regex.Match(link, pattern);
-
-            return DateTime.ParseExact(match.Groups["date"].Value, "dd-MM-yyyy", CultureInfo.InvariantCulture,
-                DateTimeStyles.AssumeUniversal);
-        }
-        catch (Exception ex)
-        {
-            logger.LogWarning($"Failed to infer date from link {link}", ex);
-
-            return DateTime.UtcNow.Date;
-        }
-    }
-
+    
     private static string MapMonth(DateTime date)
     {
         return date.Month switch

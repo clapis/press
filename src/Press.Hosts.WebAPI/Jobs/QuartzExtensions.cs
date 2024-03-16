@@ -26,7 +26,7 @@ public static class QuartzExtensions
         string schedule)
         where T : IJob
     {
-        var key = new JobKey(typeof(T).FullName);
+        var key = new JobKey(typeof(T).FullName!);
         quartz.AddJob<T>(opts => opts.WithIdentity(key));
 
         quartz.AddTrigger(opts => opts

@@ -4,21 +4,13 @@ using Press.Core.Infrastructure.Data;
 
 namespace Press.Infrastructure.MongoDb.Stores;
 
-internal class AlertStore : IAlertStore
+internal class AlertStore(IMongoCollection<Alert> alerts) : IAlertStore
 {
-    private readonly IMongoCollection<Alert> _alerts;
+    public async Task<List<Alert>> GetAllAsync(CancellationToken cancellationToken) 
+        => await alerts.Find(x => true).ToListAsync(cancellationToken);
 
-    public AlertStore(IMongoCollection<Alert> alerts) => _alerts = alerts;
-
-    public async Task<List<Alert>> GetAllAsync(CancellationToken cancellationToken)
-    {
-        return await _alerts.Find(x => true).ToListAsync(cancellationToken);
-    }
-
-    public async Task InsertAsync(Alert alert, CancellationToken cancellationToken)
-    {
-        await _alerts.InsertOneAsync(alert, cancellationToken: cancellationToken);
-    }
+    public async Task InsertAsync(Alert alert, CancellationToken cancellationToken) 
+        => await alerts.InsertOneAsync(alert, cancellationToken: cancellationToken);
 
     public async Task UpdateAsync(Alert alert, CancellationToken cancellationToken)
     {
@@ -26,6 +18,6 @@ internal class AlertStore : IAlertStore
 
         var update = Builders<Alert>.Update.Set(x => x.LastNotification, alert.LastNotification);
 
-        await _alerts.UpdateOneAsync(filter, update, new UpdateOptions { IsUpsert = false }, cancellationToken);
+        await alerts.UpdateOneAsync(filter, update, new UpdateOptions { IsUpsert = false }, cancellationToken);
     }
 }

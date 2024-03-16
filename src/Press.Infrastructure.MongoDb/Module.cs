@@ -32,16 +32,12 @@ public static class Module
         return services;
     }
     
-    private static IServiceCollection AddMongoDatabase(this IServiceCollection services, string name)
-    {
-        return services.AddSingleton(sp => sp.GetRequiredService<IMongoClient>().GetDatabase(name));
-    }
+    private static IServiceCollection AddMongoDatabase(this IServiceCollection services, string name) 
+        => services.AddSingleton(sp => sp.GetRequiredService<IMongoClient>().GetDatabase(name));
 
-    private static IServiceCollection AddMongoCollection<T>(this IServiceCollection services, string name)
-    {
-        return services.AddSingleton(sp => sp.GetRequiredService<IMongoDatabase>().GetCollection<T>(name));
-    }
-    
+    private static IServiceCollection AddMongoCollection<T>(this IServiceCollection services, string name) 
+        => services.AddSingleton(sp => sp.GetRequiredService<IMongoDatabase>().GetCollection<T>(name));
+
     private static IServiceCollection AddMongoClient(this IServiceCollection services, string connectionString)
     {
         return services.AddSingleton<IMongoClient>(_ =>
