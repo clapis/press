@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Press.Core;
 using Press.Core.Features.Publications.GetLatestBySource;
 using Press.Core.Features.Publications.Search;
+using Press.Core.Features.Sources.Scrape;
 using Press.Hosts.WebAPI.Jobs;
 using Press.Hosts.WebAPI.OpenTelemetry;
 using Press.Infrastructure.MongoDb;
@@ -41,6 +42,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.MapHealthChecks("/healthz");
+
+app.MapPost("/sources/scrape",
+    async ([FromServices] IMediator mediator, CancellationToken cancellationToken)
+        => await mediator.Send(new SourcesScrapeRequest(), cancellationToken));
 
 app.MapGet("/publications/search",
     async ([FromServices] IMediator mediator, [FromQuery(Name = "q")] string query, CancellationToken cancellationToken)

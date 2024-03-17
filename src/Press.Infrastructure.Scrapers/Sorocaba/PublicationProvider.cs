@@ -1,7 +1,8 @@
+using System.Net;
 using System.Runtime.CompilerServices;
-using System.Text.RegularExpressions;
 using AngleSharp;
 using AngleSharp.Html.Dom;
+using AngleSharp.Io;
 using Microsoft.Extensions.Logging;
 using Polly;
 using Press.Core.Domain;
@@ -28,11 +29,11 @@ public class PublicationProvider(ILogger<PublicationProvider> logger) : IPublica
         }
     }
 
-    private static IEnumerable<string> Pages() 
-        => Enumerable.Range(1, 3).Select(Page);
-
-    private static string Page(int page) 
-        => $"https://noticias.sorocaba.sp.gov.br/jornal/page/{page}/";
+    private static IEnumerable<string> Pages()
+    {
+        yield return "https://noticias.sorocaba.sp.gov.br/jornal/page/2/";
+        yield return "https://noticias.sorocaba.sp.gov.br/jornal/";
+    }
 
     private Task<List<string>> ScrapePageLinksAsync(string url, CancellationToken cancellationToken)
     {
@@ -45,9 +46,19 @@ public class PublicationProvider(ILogger<PublicationProvider> logger) : IPublica
 
     private async Task<List<string>> ScrapePageLinksCoreAsync(string url, CancellationToken cancellationToken)
     {
-        var config = Configuration.Default.WithDefaultLoader();
+        var config = Configuration.Default
+            .With<IRequester>(ctx => new DefaultHttpRequester("Mozilla/5.0", request =>
+            {
+                request.AllowAutoRedirect = true;
+                request.MaximumAutomaticRedirections = 3;
+            }))
+            .WithDefaultLoader();
+
         var context = BrowsingContext.New(config);
         var document = await context.OpenAsync(url, cancellationToken);
+
+        if (document.StatusCode != HttpStatusCode.OK)
+            logger.LogWarning("Unexpected status code: {StatusCode}", document.StatusCode);
 
         var links = document
             .QuerySelectorAll("#jornal-home a")
@@ -55,8 +66,9 @@ public class PublicationProvider(ILogger<PublicationProvider> logger) : IPublica
             .Select(x => x.Href)
             .Where(x => x.EndsWith(".pdf"))
             .Distinct()
+            .Reverse()
             .ToList();
-        
+
         return links;
     }
 }

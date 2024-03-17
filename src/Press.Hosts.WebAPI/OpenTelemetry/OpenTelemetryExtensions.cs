@@ -1,3 +1,4 @@
+using System.Text.Json;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
@@ -36,6 +37,19 @@ public static class OpenTelemetryExtensions
     private static TracerProviderBuilder AddInstrumentation(this TracerProviderBuilder builder) => builder
         .AddQuartzInstrumentation()
         .AddAspNetCoreInstrumentation()
-        .AddHttpClientInstrumentation()
+        .AddHttpClientInstrumentation(opts =>
+        {
+            opts.EnrichWithHttpRequestMessage = (activity, message) =>
+            {
+                activity.SetTag("http.request.uri", message.RequestUri);
+                activity.SetTag("http.request.user_agent", message.Headers.UserAgent);
+            };
+            
+            opts.EnrichWithHttpResponseMessage = (activity, message) =>
+            {
+                activity.SetTag("http.response.headers.location", message.Headers.Location);
+            }; 
+
+        })
         .AddSource("MongoDB.Driver.Core.Extensions.DiagnosticSources");
 }

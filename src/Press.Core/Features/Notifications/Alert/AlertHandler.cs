@@ -22,7 +22,7 @@ public class AlertHandler(
 
             if (!notifications.Any()) continue;
 
-            await notificationService.SendAlertAsync(alert, pubs, cancellationToken);
+            await notificationService.SendAlertAsync(alert, notifications, cancellationToken);
 
             alert.LastNotification = notifications.Max(x => x.CreatedOn);
 

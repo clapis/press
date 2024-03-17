@@ -10,7 +10,7 @@ public class PublicationProvider(HttpClient httpClient) : IPublicationProvider
     public async IAsyncEnumerable<Publication> ProvideAsync(
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        foreach (var date in Last15Days())
+        foreach (var date in Last7Days())
         {
             var links = await GetPublicationsByDateAsync(date, cancellationToken);
 
@@ -39,20 +39,14 @@ public class PublicationProvider(HttpClient httpClient) : IPublicationProvider
             .Select(x => PublicationLink(x.nome));
     }
 
-    private static IEnumerable<DateTime> Last15Days()
-    {
-        return Enumerable.Range(0, 15).Select(x => DateTime.Today.AddDays(-x));
-    }
+    private static IEnumerable<DateTime> Last7Days() 
+        => Enumerable.Range(0, 7).Select(x => DateTime.Today.AddDays(-x));
 
-    private static string PublicationsByDate(DateTime date)
-    {
-        return $"https://www.franca.sp.gov.br/pmf-diario/rest/diario/buscaPorArquivo/{date:dd-MM-yyyy}";
-    }
+    private static string PublicationsByDate(DateTime date) 
+        => $"https://www.franca.sp.gov.br/pmf-diario/rest/diario/buscaPorArquivo/{date:dd-MM-yyyy}";
 
-    private static string PublicationLink(string filename)
-    {
-        return $"https://www.franca.sp.gov.br/arquivos/diario-oficial/documentos/{filename}";
-    }
+    private static string PublicationLink(string filename) 
+        => $"https://www.franca.sp.gov.br/arquivos/diario-oficial/documentos/{filename}";
 
     private record Entry(string nome);
 }

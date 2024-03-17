@@ -29,7 +29,7 @@ internal class PublicationStore(IMongoCollection<Publication> publications) : IP
         return publications.Aggregate()
             .AppendStage(search)
             .SortByDescending(x => x.Date)
-            .Limit(15)
+            .Limit(30)
             .Project<Publication>(Builders<Publication>.Projection.Exclude(f => f.Contents))
             .ToListAsync(cancellationToken);
     }

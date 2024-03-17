@@ -1,5 +1,4 @@
 using MediatR;
-using Press.Core.Domain;
 using Press.Core.Infrastructure;
 using Press.Core.Infrastructure.Data;
 
@@ -17,7 +16,6 @@ public class MonitorHandler(
         var latest = await publicationStore.GetLatestPublicationsBySourceAsync(cancellationToken);
 
         var delayed = latest
-            .Where(x => x.Source == PublicationSource.Sorocaba)
             .Where(x => DateTime.UtcNow - x.CreatedOn > MaxPublicationAge)
             .ToList();
 

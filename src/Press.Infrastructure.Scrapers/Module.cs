@@ -10,7 +10,7 @@ public static class Module
         return services
             .AddHttpClient()
             .AddTransient<IPublicationProvider, Franca.PublicationProvider>()
-            // .AddTransient<IPublicationProvider, SaoCarlos.PublicationProvider>()
+            .AddTransient<IPublicationProvider, SaoCarlos.PublicationProvider>()
             .AddTransient<IPublicationProvider, Sorocaba.PublicationProvider>();
     }
 }

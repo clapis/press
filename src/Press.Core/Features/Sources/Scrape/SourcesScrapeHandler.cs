@@ -1,6 +1,7 @@
 using System.Runtime.CompilerServices;
 using System.Text;
 using MediatR;
+using Microsoft.Extensions.Logging;
 using Press.Core.Domain;
 using Press.Core.Features.Sources.Scrape.Extractors;
 using Press.Core.Infrastructure.Data;
@@ -11,7 +12,8 @@ namespace Press.Core.Features.Sources.Scrape;
 public class SourcesScrapeHandler(
     IPublicationStore store,
     IEnumerable<IPublicationProvider> providers,
-    IEnumerable<IPdfContentExtractor> extractors) 
+    IEnumerable<IPdfContentExtractor> extractors,
+    ILogger<SourcesScrapeHandler> logger)
     : IRequestHandler<SourcesScrapeRequest>
 {
     public async Task Handle(SourcesScrapeRequest request, CancellationToken cancellationToken)
@@ -28,10 +30,17 @@ public class SourcesScrapeHandler(
                 continue;
 
             // Extract contents
-            publication.Contents = await ExtractContentsAsync(publication, cancellationToken);
+            var contents = await TryExtractContentsAsync(publication, cancellationToken);
 
-            // Store the publication
-            await store.SaveAsync(publication, cancellationToken);
+            if (!string.IsNullOrEmpty(contents))
+            {
+                publication.Contents = contents;
+
+                // Store the publication
+                await store.SaveAsync(publication, cancellationToken);
+
+                logger.LogInformation("New publication scraped {Url}", publication.Url);
+            }
         }
     }
 
@@ -43,17 +52,26 @@ public class SourcesScrapeHandler(
             yield return publication;
     }
 
-    private async Task<string> ExtractContentsAsync(Publication publication, CancellationToken token)
+    private async Task<string?> TryExtractContentsAsync(Publication publication, CancellationToken token)
     {
-        var builder = new StringBuilder();
+        try
+        {
+            var builder = new StringBuilder();
 
-        builder.AppendLine(publication.Source.ToString());
+            builder.AppendLine(publication.Source.ToString());
 
-        var extractions = await Task.WhenAll(extractors
-            .Select(extractor => extractor.ExtractAsync(publication.Url, token)));
+            var extractions = await Task.WhenAll(extractors
+                .Select(extractor => extractor.ExtractAsync(publication.Url, token)));
 
-        builder.AppendJoin(" ", extractions);
+            builder.AppendJoin(" ", extractions);
 
-        return builder.ToString();
+            return builder.ToString();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to extract content from publication {Url}", publication.Url);
+
+            return default;
+        }
     }
 }
