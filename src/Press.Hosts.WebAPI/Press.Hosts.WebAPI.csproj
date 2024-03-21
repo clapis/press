@@ -26,4 +26,8 @@
       <ProjectReference Include="..\Press.Infrastructure.Scrapers\Press.Infrastructure.Scrapers.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+        <InternalsVisibleTo Include="Press.Hosts.WebAPI.Tests" />
+    </ItemGroup>
+
 </Project>

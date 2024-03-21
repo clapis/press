@@ -56,3 +56,8 @@ app.MapGet("/publications/latest-by-source",
         => await mediator.Send(new GetLatestPublicationsBySourceRequest(), cancellationToken));
 
 app.Run();
+
+
+// Required by Component tests
+public partial class Program { }
+

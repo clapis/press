@@ -27,7 +27,7 @@ public class ReportHandler(
                 if (!report.ContainsKey(alert))
                     report[alert] = [];
                 
-                pubs.AddRange(pubs);
+                report[alert].AddRange(pubs);
             }
 
             if (!report.Any()) continue;

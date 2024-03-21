@@ -62,4 +62,21 @@ public class SourcesScrapeTests
             _extractor.Verify(x 
                     => x.ExtractAsync($"https://example.com/{source}/document-1.pdf", It.IsAny<CancellationToken>()), Times.Never);
     }
+    
+    [Fact(DisplayName = "When content extraction fails, skip it")]
+    public async Task Test02()
+    {
+        _store
+            .Setup(x => x.GetLatestUrlsAsync(It.IsAny<PublicationSource>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync([]);
+
+        _extractor
+            .Setup(x => x.ExtractAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new Exception("Failed to extract document contents"));
+
+        await _handler.Handle(new SourcesScrapeRequest(), CancellationToken.None);
+        
+        _store.Verify(x 
+            => x.SaveAsync(It.IsAny<Publication>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
 }
