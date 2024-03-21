@@ -1,4 +1,3 @@
-using System.Runtime.CompilerServices;
 using System.Text;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -11,59 +10,50 @@ namespace Press.Core.Features.Sources.Scrape;
 
 public class SourcesScrapeHandler(
     IPublicationStore store,
+    IPdfContentExtractor extractor,
     IEnumerable<IPublicationProvider> providers,
-    IEnumerable<IPdfContentExtractor> extractors,
     ILogger<SourcesScrapeHandler> logger)
     : IRequestHandler<SourcesScrapeRequest>
 {
     public async Task Handle(SourcesScrapeRequest request, CancellationToken cancellationToken)
     {
-        // Get all stored publication urls, so we just download new publications
-        var urls = await store.GetAllUrlsAsync(cancellationToken);
-        var stored = new HashSet<string>(urls, StringComparer.OrdinalIgnoreCase);
-
-        // Scrape sources for publications
-        await foreach (var publication in GetPublicationsAsync(cancellationToken))
+        foreach (var source in request.Sources)
         {
-            // Exclude publications we already have downloaded
-            if (stored.Contains(publication.Url))
-                continue;
+            // Retrieve latest publication urls, so that we process only what's new
+            var urls = await store.GetLatestUrlsAsync(source, cancellationToken);
+            var stored = new HashSet<string>(urls, StringComparer.OrdinalIgnoreCase);
 
-            // Extract contents
-            var contents = await TryExtractContentsAsync(publication, cancellationToken);
+            // Scrape source for latest publication links
+            var provider = providers.Single(x => x.Source == source);
+            var publications = await provider.ProvideAsync(cancellationToken);
 
-            if (!string.IsNullOrEmpty(contents))
+            // Extract contents of new publications
+            foreach (var publication in publications.Where(publication => !stored.Contains(publication.Url)))
             {
-                publication.Contents = contents;
+                var contents = await TryExtractContentsAsync(publication, cancellationToken);
 
-                // Store the publication
-                await store.SaveAsync(publication, cancellationToken);
+                if (!string.IsNullOrEmpty(contents))
+                {
+                    publication.Contents = contents;
 
-                logger.LogInformation("New publication scraped {Url}", publication.Url);
+                    await store.SaveAsync(publication, cancellationToken);
+
+                    logger.LogInformation("New publication scraped {Url}", publication.Url);
+                }
             }
         }
-    }
-
-    private async IAsyncEnumerable<Publication> GetPublicationsAsync(
-        [EnumeratorCancellation] CancellationToken cancellationToken)
-    {
-        foreach (var provider in providers)
-        await foreach (var publication in provider.ProvideAsync(cancellationToken))
-            yield return publication;
     }
 
     private async Task<string?> TryExtractContentsAsync(Publication publication, CancellationToken token)
     {
         try
         {
+            var contents = await extractor.ExtractAsync(publication.Url, token);
+
             var builder = new StringBuilder();
 
-            builder.AppendLine(publication.Source.ToString());
-
-            var extractions = await Task.WhenAll(extractors
-                .Select(extractor => extractor.ExtractAsync(publication.Url, token)));
-
-            builder.AppendJoin(" ", extractions);
+            builder.Append($"{publication.Source} ");
+            builder.Append(contents);
 
             return builder.ToString();
         }

@@ -1,4 +1,3 @@
-using System.Runtime.CompilerServices;
 using AngleSharp;
 using AngleSharp.Html.Dom;
 using Microsoft.Extensions.Logging;
@@ -10,21 +9,26 @@ namespace Press.Infrastructure.Scrapers.SaoCarlos;
 
 public class PublicationProvider(ILogger<PublicationProvider> logger) : IPublicationProvider
 {
-    public async IAsyncEnumerable<Publication> ProvideAsync(
-        [EnumeratorCancellation] CancellationToken cancellationToken)
+    public PublicationSource Source => PublicationSource.SaoCarlos;
+
+    public async Task<List<Publication>> ProvideAsync(CancellationToken cancellationToken)
     {
+        var publications = new List<Publication>();
+        
         foreach (var page in Pages())
         {
             var links = await ScrapePageLinksAsync(page, cancellationToken);
 
-            foreach (var link in links)
-                yield return new Publication
+            publications.AddRange(links
+                .Select(link => new Publication
                 {
                     Url = link,
-                    Date = DateTime.UtcNow.Date,
-                    Source = PublicationSource.SaoCarlos
-                };
+                    Source = Source,
+                    Date = DateTime.UtcNow.Date
+                }));
         }
+
+        return publications;
     }
 
     private static IEnumerable<string> Pages()
@@ -34,7 +38,7 @@ public class PublicationProvider(ILogger<PublicationProvider> logger) : IPublica
         yield return Page(DateTime.Today.AddMonths(-1));
     }
 
-    private static string Page(DateTime date) 
+    private static string Page(DateTime date)
         => $"http://www.saocarlos.sp.gov.br/index.php/diario-oficial-{date.Year}/diario-oficial-{MapMonth(date)}-{date.Year}.html";
 
     private Task<List<string>> ScrapePageLinksAsync(string url, CancellationToken cancellationToken)
@@ -60,10 +64,10 @@ public class PublicationProvider(ILogger<PublicationProvider> logger) : IPublica
             .Where(x => x.EndsWith(".pdf"))
             .Distinct()
             .ToList();
-        
+
         return links;
     }
-    
+
     private static string MapMonth(DateTime date)
     {
         return date.Month switch

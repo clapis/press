@@ -4,5 +4,7 @@ namespace Press.Core.Infrastructure.Scrapers;
 
 public interface IPublicationProvider
 {
-    IAsyncEnumerable<Publication> ProvideAsync(CancellationToken cancellationToken);
+    PublicationSource Source { get; }
+    
+    Task<List<Publication>> ProvideAsync(CancellationToken cancellationToken);
 }

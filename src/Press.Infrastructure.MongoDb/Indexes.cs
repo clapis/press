@@ -13,6 +13,12 @@ internal class Indexes(IMongoCollection<Publication> publications) : IHostedServ
             new CreateIndexOptions { Background = true }), cancellationToken: cancellationToken);
 
         await publications.Indexes.CreateOneAsync(new CreateIndexModel<Publication>(
+            Builders<Publication>.IndexKeys
+                .Ascending(x => x.Source)
+                .Descending(x => x.Date),
+            new CreateIndexOptions { Background = true }), cancellationToken: cancellationToken);
+
+        await publications.Indexes.CreateOneAsync(new CreateIndexModel<Publication>(
             Builders<Publication>.IndexKeys.Ascending(x => x.Url),
             new CreateIndexOptions { Background = true, Unique = true }), cancellationToken: cancellationToken);
     }

@@ -1,5 +1,4 @@
 using System.Net;
-using System.Runtime.CompilerServices;
 using AngleSharp;
 using AngleSharp.Html.Dom;
 using AngleSharp.Io;
@@ -12,27 +11,32 @@ namespace Press.Infrastructure.Scrapers.Sorocaba;
 
 public class PublicationProvider(ILogger<PublicationProvider> logger) : IPublicationProvider
 {
-    public async IAsyncEnumerable<Publication> ProvideAsync(
-        [EnumeratorCancellation] CancellationToken cancellationToken)
+    public PublicationSource Source => PublicationSource.Sorocaba;
+
+    public async Task<List<Publication>> ProvideAsync(CancellationToken cancellationToken)
     {
+        var publications = new List<Publication>();
+        
         foreach (var page in Pages())
         {
             var links = await ScrapePageLinksAsync(page, cancellationToken);
 
-            foreach (var link in links)
-                yield return new Publication
+            publications.AddRange(links
+                .Select(link => new Publication
                 {
                     Url = link,
-                    Date = DateTime.UtcNow.Date,
-                    Source = PublicationSource.Sorocaba
-                };
+                    Source = Source,
+                    Date = DateTime.UtcNow.Date
+                }));
         }
+
+        return publications;
     }
 
     private static IEnumerable<string> Pages()
     {
-        yield return "https://noticias.sorocaba.sp.gov.br/jornal/page/2/";
         yield return "https://noticias.sorocaba.sp.gov.br/jornal/";
+        yield return "https://noticias.sorocaba.sp.gov.br/jornal/page/2/";
     }
 
     private Task<List<string>> ScrapePageLinksAsync(string url, CancellationToken cancellationToken)
@@ -47,7 +51,7 @@ public class PublicationProvider(ILogger<PublicationProvider> logger) : IPublica
     private async Task<List<string>> ScrapePageLinksCoreAsync(string url, CancellationToken cancellationToken)
     {
         var config = Configuration.Default
-            .With<IRequester>(ctx => new DefaultHttpRequester("Mozilla/5.0", request =>
+            .With<IRequester>(_ => new DefaultHttpRequester("Mozilla/5.0", request =>
             {
                 request.AllowAutoRedirect = true;
                 request.MaximumAutomaticRedirections = 3;
@@ -66,7 +70,6 @@ public class PublicationProvider(ILogger<PublicationProvider> logger) : IPublica
             .Select(x => x.Href)
             .Where(x => x.EndsWith(".pdf"))
             .Distinct()
-            .Reverse()
             .ToList();
 
         return links;
