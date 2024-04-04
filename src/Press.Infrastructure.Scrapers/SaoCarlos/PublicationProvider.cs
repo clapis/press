@@ -1,13 +1,16 @@
 using AngleSharp;
 using AngleSharp.Html.Dom;
 using Microsoft.Extensions.Logging;
-using Polly;
+using Polly.Registry;
 using Press.Core.Domain;
 using Press.Core.Infrastructure.Scrapers;
 
 namespace Press.Infrastructure.Scrapers.SaoCarlos;
 
-public class PublicationProvider(ILogger<PublicationProvider> logger) : IPublicationProvider
+public class PublicationProvider(
+    ILogger<PublicationProvider> logger,
+    ResiliencePipelineProvider<string> polly
+    ) : IPublicationProvider
 {
     public PublicationSource Source => PublicationSource.SaoCarlos;
 
@@ -41,13 +44,12 @@ public class PublicationProvider(ILogger<PublicationProvider> logger) : IPublica
     private static string Page(DateTime date)
         => $"http://www.saocarlos.sp.gov.br/index.php/diario-oficial-{date.Year}/diario-oficial-{MapMonth(date)}-{date.Year}.html";
 
-    private Task<List<string>> ScrapePageLinksAsync(string url, CancellationToken cancellationToken)
+    private async Task<List<string>> ScrapePageLinksAsync(string url, CancellationToken cancellationToken)
     {
-        return Policy
-            .HandleResult<List<string>>(links => links.Count == 0)
-            .WaitAndRetryAsync(3, i => TimeSpan.FromSeconds(2 * i),
-                (_, _) => logger.LogWarning("No links founds at {Url}, retrying..", url))
-            .ExecuteAsync(async () => await ScrapePageLinksCoreAsync(url, cancellationToken));
+        var policy = polly.GetPipeline<List<string>>("no-links");
+
+        return await policy.ExecuteAsync(async token 
+            => await ScrapePageLinksCoreAsync(url, token), cancellationToken);
     }
 
     private async Task<List<string>> ScrapePageLinksCoreAsync(string url, CancellationToken cancellationToken)

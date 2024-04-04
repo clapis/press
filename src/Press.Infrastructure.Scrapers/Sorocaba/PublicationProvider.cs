@@ -4,6 +4,7 @@ using AngleSharp.Html.Dom;
 using AngleSharp.Io;
 using Microsoft.Extensions.Logging;
 using Polly;
+using Polly.Retry;
 using Press.Core.Domain;
 using Press.Core.Infrastructure.Scrapers;
 
@@ -39,13 +40,27 @@ public class PublicationProvider(ILogger<PublicationProvider> logger) : IPublica
         yield return "https://noticias.sorocaba.sp.gov.br/jornal/page/2/";
     }
 
-    private Task<List<string>> ScrapePageLinksAsync(string url, CancellationToken cancellationToken)
+    private async Task<List<string>> ScrapePageLinksAsync(string url, CancellationToken cancellationToken)
     {
-        return Policy
-            .HandleResult<List<string>>(links => links.Count == 0)
-            .WaitAndRetryAsync(3, i => TimeSpan.FromSeconds(2 * i),
-                (_, _) => logger.LogWarning("No links founds at {Url}, retrying..", url))
-            .ExecuteAsync(async () => await ScrapePageLinksCoreAsync(url, cancellationToken));
+        var policy = new ResiliencePipelineBuilder<List<string>>()
+            .AddRetry(new RetryStrategyOptions<List<string>>()
+            {
+                MaxRetryAttempts = 3,
+                Delay = TimeSpan.FromSeconds(2),
+                BackoffType = DelayBackoffType.Exponential,
+                ShouldHandle = new PredicateBuilder<List<string>>()
+                    .HandleResult(x => x.Count == 0),
+                OnRetry = _ =>
+                {
+                    logger.LogWarning("No links founds at {Url}, retrying..", url);
+
+                    return ValueTask.CompletedTask;
+                }
+            })
+            .Build();
+
+        return await policy.ExecuteAsync(async token 
+            => await ScrapePageLinksCoreAsync(url, token), cancellationToken);
     }
 
     private async Task<List<string>> ScrapePageLinksCoreAsync(string url, CancellationToken cancellationToken)
