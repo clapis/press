@@ -12,6 +12,8 @@ public class PublicationProvider(
     ResiliencePipelineProvider<string> polly
     ) : IPublicationProvider
 {
+    public bool IsEnabled => true;
+
     public PublicationSource Source => PublicationSource.SaoCarlos;
 
     public async Task<List<Publication>> ProvideAsync(CancellationToken cancellationToken)

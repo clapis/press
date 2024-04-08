@@ -17,14 +17,13 @@ public class SourcesScrapeHandler(
 {
     public async Task Handle(SourcesScrapeRequest request, CancellationToken cancellationToken)
     {
-        foreach (var source in request.Sources)
+        foreach (var provider in providers.Where(p => p.IsEnabled))
         {
             // Retrieve latest publication urls, so that we process only what's new
-            var urls = await store.GetLatestUrlsAsync(source, cancellationToken);
+            var urls = await store.GetLatestUrlsAsync(provider.Source, cancellationToken);
             var stored = new HashSet<string>(urls, StringComparer.OrdinalIgnoreCase);
 
             // Scrape source for latest publication links
-            var provider = providers.Single(x => x.Source == source);
             var publications = await provider.ProvideAsync(cancellationToken);
 
             // Extract contents of new publications

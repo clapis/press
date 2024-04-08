@@ -6,6 +6,8 @@ namespace Press.Infrastructure.Scrapers.Franca;
 
 public class PublicationProvider(HttpClient httpClient) : IPublicationProvider
 {
+    public bool IsEnabled => false;
+    
     public PublicationSource Source => PublicationSource.Franca;
 
     public async Task<List<Publication>> ProvideAsync(CancellationToken cancellationToken)

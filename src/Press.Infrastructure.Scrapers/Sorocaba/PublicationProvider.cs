@@ -12,6 +12,8 @@ namespace Press.Infrastructure.Scrapers.Sorocaba;
 
 public class PublicationProvider(ILogger<PublicationProvider> logger) : IPublicationProvider
 {
+    public bool IsEnabled => true;
+
     public PublicationSource Source => PublicationSource.Sorocaba;
 
     public async Task<List<Publication>> ProvideAsync(CancellationToken cancellationToken)

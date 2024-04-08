@@ -24,6 +24,10 @@ public class SourcesScrapeTests
                 var provider = new Mock<IPublicationProvider>();
 
                 provider
+                    .SetupGet(x => x.IsEnabled)
+                    .Returns(true);
+                
+                provider
                     .SetupGet(x => x.Source)
                     .Returns(source);
                 
@@ -58,9 +62,8 @@ public class SourcesScrapeTests
         
         await _handler.Handle(request, CancellationToken.None);
         
-        foreach (var source in request.Sources)
-            _extractor.Verify(x 
-                    => x.ExtractAsync($"https://example.com/{source}/document-1.pdf", It.IsAny<CancellationToken>()), Times.Never);
+        _extractor.Verify(x 
+                => x.ExtractAsync(It.Is<string>(url => url.EndsWith("document-1.pdf")), It.IsAny<CancellationToken>()), Times.Never);
     }
     
     [Fact(DisplayName = "When content extraction fails, skip it")]
