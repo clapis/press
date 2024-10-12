@@ -1,4 +1,6 @@
 using System.Text;
+using System.Text.Json;
+using Microsoft.Extensions.Logging;
 using PostmarkDotNet;
 using Press.Core.Domain;
 using Press.Core.Infrastructure;
@@ -10,9 +12,13 @@ public class NotificationService : INotificationService
 {
     private readonly PostmarkClient _client;
     private readonly PostmarkSettings _settings;
+    private readonly ILogger<NotificationService> _logger;
 
-    public NotificationService(PostmarkSettings settings)
+    public NotificationService(
+        PostmarkSettings settings, 
+        ILogger<NotificationService> logger)
     {
+        _logger = logger;
         _settings = settings;
         _client = new PostmarkClient(_settings.ApiToken);
     }
@@ -79,6 +85,12 @@ public class NotificationService : INotificationService
             Subject = $"[Press] {subject}",
             TextBody = body
         };
+        
+        if (!_settings.IsEnabled)
+        {
+            _logger.LogInformation("Postmark disabled. {PostmarkMessage}",JsonSerializer.Serialize(msg));
+            return;
+        }
 
         var response = await _client.SendMessageAsync(msg);
 

@@ -21,7 +21,7 @@ public class EndpointTests(PressApplicationFactory factory)
     {
         using var client = factory.CreateClient();
 
-        var publications = await client.GetFromJsonAsync<List<Publication>>("/publications/latest-by-source");
+        var publications = await client.GetFromJsonAsync<List<Publication>>("/publications/latest");
         
         Assert.Empty(publications!);
     }

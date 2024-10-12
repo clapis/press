@@ -18,7 +18,7 @@ public static class QuartzExtensions
             quartz.AddJobAndTrigger<MediatrJob<SourcesScrapeRequest>>("0 0 0,16,20 * * ?");
         });
 
-        services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
+        services.AddQuartzHostedService(q => q.WaitForJobsToComplete = false);
 
         return services;
     }

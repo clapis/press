@@ -51,7 +51,7 @@ app.MapGet("/publications/search",
     async ([FromServices] IMediator mediator, [FromQuery(Name = "q")] string query, CancellationToken cancellationToken)
         => await mediator.Send(new PublicationsSearchRequest(query), cancellationToken));
 
-app.MapGet("/publications/latest-by-source",
+app.MapGet("/publications/latest",
     async ([FromServices] IMediator mediator, CancellationToken cancellationToken)
         => await mediator.Send(new GetLatestPublicationsBySourceRequest(), cancellationToken));
 
