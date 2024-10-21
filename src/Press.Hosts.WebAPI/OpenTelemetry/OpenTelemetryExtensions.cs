@@ -9,6 +9,8 @@ public static class OpenTelemetryExtensions
 {
     public static IServiceCollection AddOpenTelemetry(this IServiceCollection services, GrafanaCloudOptions options)
     {
+        if (!options.IsEnabled) return services;
+        
         services
             .ConfigureGrafanaCloudExporter(options);
 

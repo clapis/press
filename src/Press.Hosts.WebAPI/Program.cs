@@ -1,9 +1,5 @@
-using MediatR;
-using Microsoft.AspNetCore.Mvc;
 using Press.Core;
-using Press.Core.Features.Publications.GetLatestBySource;
-using Press.Core.Features.Publications.Search;
-using Press.Core.Features.Sources.Scrape;
+using Press.Hosts.WebAPI.Endpoints;
 using Press.Hosts.WebAPI.Jobs;
 using Press.Hosts.WebAPI.OpenTelemetry;
 using Press.Infrastructure.MongoDb;
@@ -33,6 +29,16 @@ builder.Services
     .AddSwaggerGen()
     .AddEndpointsApiExplorer();
 
+builder.Services
+    .AddAuthentication()
+    .AddJwtBearer(opts =>
+    {
+        opts.Authority = "https://halyard.kinde.com";
+        opts.TokenValidationParameters.ValidateAudience = false;
+    });
+
+builder.Services.AddAuthorization();
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -41,19 +47,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.MapHealthChecks("/healthz");
-
-app.MapPost("/sources/scrape",
-    async ([FromServices] IMediator mediator, CancellationToken cancellationToken)
-        => await mediator.Send(new SourcesScrapeRequest(), cancellationToken));
-
-app.MapGet("/publications/search",
-    async ([FromServices] IMediator mediator, [FromQuery(Name = "q")] string query, CancellationToken cancellationToken)
-        => await mediator.Send(new PublicationsSearchRequest(query), cancellationToken));
-
-app.MapGet("/publications/latest",
-    async ([FromServices] IMediator mediator, CancellationToken cancellationToken)
-        => await mediator.Send(new GetLatestPublicationsBySourceRequest(), cancellationToken));
+app.MapAlertEndpoints()
+    .MapPublicationEndpoints()
+    .MapHealthChecks("/healthz");
 
 app.Run();
 

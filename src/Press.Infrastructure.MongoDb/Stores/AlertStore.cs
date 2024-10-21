@@ -9,8 +9,14 @@ internal class AlertStore(IMongoCollection<Alert> alerts) : IAlertStore
     public async Task<List<Alert>> GetAllAsync(CancellationToken cancellationToken) 
         => await alerts.Find(x => true).ToListAsync(cancellationToken);
 
+    public async Task<List<Alert>> GetByUserIdAsync(string email, CancellationToken cancellationToken)
+        => await alerts.Find(x => x.NotifyEmail == email).ToListAsync(cancellationToken);
+
     public async Task InsertAsync(Alert alert, CancellationToken cancellationToken) 
         => await alerts.InsertOneAsync(alert, cancellationToken: cancellationToken);
+
+    public async Task DeleteAsync(string id, string userId, CancellationToken cancellationToken) 
+        => await alerts.DeleteOneAsync(x => x.Id == id && x.NotifyEmail == userId, cancellationToken);
 
     public async Task UpdateAsync(Alert alert, CancellationToken cancellationToken)
     {
