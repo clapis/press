@@ -3,17 +3,17 @@ using Press.Core.Domain;
 using Press.Core.Infrastructure;
 using Press.Core.Infrastructure.Data;
 
-namespace Press.Core.Features.Notifications.Monitor;
+namespace Press.Core.Features.System.MonitorDelay;
 
-public class MonitorHandler(
+public class MonitorDelayHandler(
     IPublicationStore publicationStore, 
     INotificationService notificationService) 
-    : IRequestHandler<MonitorRequest>
+    : IRequestHandler<MonitorDelayRequest>
 {
     private static readonly TimeSpan MaxPublicationAge = TimeSpan.FromDays(3);
     private static readonly PublicationSource[] MonitorSources = [PublicationSource.Sorocaba, PublicationSource.SaoCarlos];
     
-    public async Task Handle(MonitorRequest request, CancellationToken cancellationToken)
+    public async Task Handle(MonitorDelayRequest delayRequest, CancellationToken cancellationToken)
     {
         var latest = await publicationStore.GetLatestPublicationsBySourceAsync(cancellationToken);
 
@@ -24,6 +24,6 @@ public class MonitorHandler(
 
         if (!delayed.Any()) return;
 
-        await notificationService.SendMonitorAsync(delayed, cancellationToken);
+        await notificationService.SendDelayNotificationAsync(delayed, cancellationToken);
     }
 }

@@ -62,7 +62,7 @@ public class NotificationService : INotificationService
         await NotifyAsync(email, subject, body.ToString(), cancellationToken);
     }
 
-    public async Task SendMonitorAsync(List<Publication> publications, CancellationToken cancellationToken)
+    public async Task SendDelayNotificationAsync(List<Publication> publications, CancellationToken cancellationToken)
     {
         var subject = "Atraso";
 

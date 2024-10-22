@@ -18,7 +18,9 @@ public class AlertHandler(
         {
             var pubs = await publicationStore.SearchAsync(alert.Term, cancellationToken);
 
-            var notifications = pubs.Where(p => p.CreatedOn > alert.LastNotification).ToList();
+            var last = alert.LastNotification ?? DateTime.MinValue;
+
+            var notifications = pubs.Where(p => p.CreatedOn > last).ToList();
 
             if (!notifications.Any()) continue;
 
