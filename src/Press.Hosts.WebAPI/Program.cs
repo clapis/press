@@ -33,7 +33,7 @@ builder.Services
     .AddAuthentication()
     .AddJwtBearer(opts =>
     {
-        opts.Authority = "https://halyard.kinde.com";
+        opts.Authority = "https://alertadiario.kinde.com";
         opts.TokenValidationParameters.ValidateAudience = false;
     });
 
