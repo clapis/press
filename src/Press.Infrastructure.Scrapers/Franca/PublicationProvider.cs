@@ -6,7 +6,7 @@ namespace Press.Infrastructure.Scrapers.Franca;
 
 public class PublicationProvider(HttpClient httpClient) : IPublicationProvider
 {
-    public bool IsEnabled => false;
+    public bool IsEnabled => true;
     
     public PublicationSource Source => PublicationSource.Franca;
 
