@@ -4,11 +4,9 @@ using Press.Core.Infrastructure.Scrapers;
 
 namespace Press.Infrastructure.Scrapers.Franca;
 
-public class PublicationProvider(HttpClient httpClient) : IPublicationProvider
+public class SourcePublicationProvider(HttpClient httpClient) : ISourcePublicationProvider
 {
-    public bool IsEnabled => true;
-    
-    public PublicationSource Source => PublicationSource.Franca;
+    public string SourceId => "dom_sp_franca";
 
     public async Task<List<Publication>> ProvideAsync(CancellationToken cancellationToken)
     {
@@ -22,7 +20,7 @@ public class PublicationProvider(HttpClient httpClient) : IPublicationProvider
                 .Select(link => new Publication
                 {
                     Url = link,
-                    Source = Source,
+                    SourceId = SourceId,
                     Date = DateTime.UtcNow.Date
                 }));
         }

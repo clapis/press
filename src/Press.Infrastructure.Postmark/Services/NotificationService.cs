@@ -82,7 +82,7 @@ public class NotificationService : INotificationService
         {
             To = email,
             From = _settings.Sender,
-            Subject = $"[Press] {subject}",
+            Subject = $"{subject}",
             TextBody = body
         };
         

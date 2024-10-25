@@ -12,10 +12,10 @@ public static class QuartzExtensions
     {
         services.AddQuartz(quartz =>
         {
-            quartz.AddJobAndTrigger<MediatrJob<AlertRequest>>("0 10 0,16,20 * * ?");
+            quartz.AddJobAndTrigger<MediatrJob<AlertRequest>>("0 15 0,16,20 * * ?");
             quartz.AddJobAndTrigger<MediatrJob<ReportRequest>>("0 0 12 ? * SAT");
             quartz.AddJobAndTrigger<MediatrJob<MonitorDelayRequest>>("0 0 12 * * ?");
-            quartz.AddJobAndTrigger<MediatrJob<SourcesScrapeRequest>>("0 0 0,16,20 * * ?");
+            quartz.AddJobAndTrigger<MediatrJob<ScrapeSourcesRequest>>("0 0 0,16,20 * * ?");
         });
 
         services.AddQuartzHostedService(q => q.WaitForJobsToComplete = false);

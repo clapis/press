@@ -23,11 +23,16 @@ public static class Module
             .AddSingleton<IAlertStore, AlertStore>();
 
         services
+            .AddMongoCollection<Source>("sources")
+            .AddSingleton<ISourceStore, SourceStore>();
+
+        services
             .AddMongoCollection<Publication>("publications")
             .AddSingleton<IPublicationStore, PublicationStore>();
-        
+
         services
-            .AddHostedService<Indexes>();
+            .AddHostedService<Indexes>()
+            .AddHostedService<Migration>();
 
         return services;
     }

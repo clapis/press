@@ -46,7 +46,7 @@ static CommandLineBuilder BuildCommandLine()
 
     root
         .AddSubcommand("sources", opts => opts
-            .AddSubcommand<SourcesScrapeRequest>("scrape", "Scrapes a given source for new publications"))
+            .AddSubcommand<ScrapeSourcesRequest>("scrape", "Scrapes a given source for new publications"))
         .AddSubcommand("publications", opts => opts
             .AddSubcommand<PublicationsSearchRequest>("search", "Search scraped publications for a given term")
             .AddSubcommand<GetLatestPublicationsBySourceRequest>("latest", "Returns latest publications by source"));

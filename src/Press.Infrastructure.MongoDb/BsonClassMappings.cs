@@ -10,14 +10,18 @@ internal static class BsonClassMappings
 {
     public static void Configure()
     {
+        BsonClassMap.RegisterClassMap<Source>(map =>
+        {
+            map.AutoMap();
+            map.MapIdProperty(x => x.Id);
+        });
+        
         BsonClassMap.RegisterClassMap<Publication>(map =>
         {
             map.AutoMap();
             map.MapIdProperty(x => x.Id)
                 .SetIdGenerator(new StringObjectIdGenerator())
                 .SetSerializer(new StringSerializer(BsonType.ObjectId));
-            map.MapMember(x => x.Source)
-                .SetSerializer(new EnumSerializer<PublicationSource>(BsonType.String));
         });
 
         BsonClassMap.RegisterClassMap<Alert>(map =>

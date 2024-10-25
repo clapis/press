@@ -2,11 +2,9 @@ using Press.Core.Domain;
 
 namespace Press.Core.Infrastructure.Scrapers;
 
-public interface IPublicationProvider
+public interface ISourcePublicationProvider
 {
-    bool IsEnabled { get; }
+    string SourceId { get; }
 
-    PublicationSource Source { get; }
-    
     Task<List<Publication>> ProvideAsync(CancellationToken cancellationToken);
 }

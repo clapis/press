@@ -8,8 +8,8 @@ namespace Press.Infrastructure.MongoDb.Stores;
 
 internal class PublicationStore(IMongoCollection<Publication> publications) : IPublicationStore
 {
-    public async Task<List<string>> GetLatestUrlsAsync(PublicationSource source, CancellationToken cancellationToken) 
-        => await publications.Find(x => x.Source == source)
+    public async Task<List<string>> GetLatestUrlsAsync(Source source, CancellationToken cancellationToken) 
+        => await publications.Find(x => x.SourceId == source.Id)
             .SortByDescending(x => x.Date)
             .Limit(100)
             .Project(x => x.Url)
@@ -41,14 +41,14 @@ internal class PublicationStore(IMongoCollection<Publication> publications) : IP
         return publications
             .AsQueryable()
             .OrderByDescending(x => x.Date)
-            .GroupBy(x => x.Source)
+            .GroupBy(x => x.SourceId)
             .Select(g => g.First())
             .Select(x => new Publication
             {
                 Id = x.Id,
                 Url = x.Url,
                 Date = x.Date,
-                Source = x.Source,
+                SourceId = x.SourceId,
                 CreatedOn = x.CreatedOn
             })
             .ToListAsync(cancellationToken);

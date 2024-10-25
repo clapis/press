@@ -10,11 +10,9 @@ using Press.Core.Infrastructure.Scrapers;
 
 namespace Press.Infrastructure.Scrapers.Sorocaba;
 
-public class PublicationProvider(ILogger<PublicationProvider> logger) : IPublicationProvider
+public class SourcePublicationProvider(ILogger<SourcePublicationProvider> logger) : ISourcePublicationProvider
 {
-    public bool IsEnabled => true;
-
-    public PublicationSource Source => PublicationSource.Sorocaba;
+    public string SourceId => "dom_sp_sorocaba";
 
     public async Task<List<Publication>> ProvideAsync(CancellationToken cancellationToken)
     {
@@ -28,7 +26,7 @@ public class PublicationProvider(ILogger<PublicationProvider> logger) : IPublica
                 .Select(link => new Publication
                 {
                     Url = link,
-                    Source = Source,
+                    SourceId = SourceId,
                     Date = DateTime.UtcNow.Date
                 }));
         }

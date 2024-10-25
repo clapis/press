@@ -7,5 +7,5 @@ public interface IPublicationStore
     Task SaveAsync(Publication publication, CancellationToken cancellationToken);
     Task<List<Publication>> SearchAsync(string query, CancellationToken cancellationToken);
     Task<List<Publication>> GetLatestPublicationsBySourceAsync(CancellationToken cancellationToken);
-    Task<List<string>> GetLatestUrlsAsync(PublicationSource source, CancellationToken cancellationToken);
+    Task<List<string>> GetLatestUrlsAsync(Source source, CancellationToken cancellationToken);
 }

@@ -1,6 +1,6 @@
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
-using Press.Core.Features.Sources.Scrape.Extractors;
+using Press.Core.Features.Sources.Scrape;
 
 namespace Press.Core;
 
@@ -12,7 +12,9 @@ public static class Module
             => x.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
         services
-            .AddTransient<IPdfContentExtractor, PigExtractor>();
+            .AddTransient<ScrappingService>()
+            .AddTransient<IPdfContentExtractor, PigExtractor>()
+            .AddTransient<IPublicationProvider, PublicationProvider>();
 
         return services;
     }

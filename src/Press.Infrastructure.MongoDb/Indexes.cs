@@ -14,7 +14,7 @@ internal class Indexes(IMongoCollection<Publication> publications) : IHostedServ
 
         await publications.Indexes.CreateOneAsync(new CreateIndexModel<Publication>(
             Builders<Publication>.IndexKeys
-                .Ascending(x => x.Source)
+                .Ascending(x => x.SourceId)
                 .Descending(x => x.Date),
             new CreateIndexOptions { Background = true }), cancellationToken: cancellationToken);
 

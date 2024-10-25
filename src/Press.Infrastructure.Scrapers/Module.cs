@@ -12,9 +12,9 @@ public static class Module
         return services
             .AddHttpClient()
             .AddPollyPipelines()
-            .AddTransient<IPublicationProvider, Franca.PublicationProvider>()
-            .AddTransient<IPublicationProvider, SaoCarlos.PublicationProvider>()
-            .AddTransient<IPublicationProvider, Sorocaba.PublicationProvider>();
+            .AddTransient<ISourcePublicationProvider, Franca.SourcePublicationProvider>()
+            .AddTransient<ISourcePublicationProvider, SaoCarlos.SourcePublicationProvider>()
+            .AddTransient<ISourcePublicationProvider, Sorocaba.SourcePublicationProvider>();
     }
 
     private static IServiceCollection AddPollyPipelines(this IServiceCollection services)

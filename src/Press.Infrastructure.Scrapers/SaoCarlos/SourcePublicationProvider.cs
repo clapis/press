@@ -7,14 +7,12 @@ using Press.Core.Infrastructure.Scrapers;
 
 namespace Press.Infrastructure.Scrapers.SaoCarlos;
 
-public class PublicationProvider(
-    ILogger<PublicationProvider> logger,
+public class SourcePublicationProvider(
+    ILogger<SourcePublicationProvider> logger,
     ResiliencePipelineProvider<string> polly
-    ) : IPublicationProvider
+    ) : ISourcePublicationProvider
 {
-    public bool IsEnabled => true;
-
-    public PublicationSource Source => PublicationSource.SaoCarlos;
+    public string SourceId => "dom_sp_sao_carlos";
 
     public async Task<List<Publication>> ProvideAsync(CancellationToken cancellationToken)
     {
@@ -28,7 +26,7 @@ public class PublicationProvider(
                 .Select(link => new Publication
                 {
                     Url = link,
-                    Source = Source,
+                    SourceId = SourceId,
                     Date = DateTime.UtcNow.Date
                 }));
         }
