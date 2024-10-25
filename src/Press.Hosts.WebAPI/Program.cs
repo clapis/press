@@ -20,6 +20,11 @@ builder.Services
     .AddPostmark(GetSettings<PostmarkSettings>("Postmark"));
 
 builder.Services
+    .AddAuthorization()
+    .AddAuthentication()
+    .AddJwtBearer(builder.Configuration.GetSection("Authorization:Jwt").Bind);
+
+builder.Services
     .AddOpenTelemetry(GetSettings<GrafanaCloudOptions>("Grafana"));
 
 builder.Services
@@ -30,10 +35,7 @@ builder.Services
     .AddEndpointsApiExplorer();
 
 builder.Services
-    .AddAuthentication()
-    .AddJwtBearer(builder.Configuration.GetSection("Authorization:Jwt").Bind);
-
-builder.Services.AddAuthorization();
+    .AddOutputCache();
 
 var app = builder.Build();
 
@@ -42,6 +44,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseOutputCache();
 
 app.MapAlertEndpoints()
     .MapPublicationEndpoints()

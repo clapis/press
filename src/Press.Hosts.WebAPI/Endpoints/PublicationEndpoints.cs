@@ -17,7 +17,8 @@ public static class PublicationEndpoints
 
         group.MapGet("/latest",
             async ([FromServices] IMediator mediator, CancellationToken cancellationToken)
-                => await mediator.Send(new GetLatestPublicationsBySourceRequest(), cancellationToken));
+                => await mediator.Send(new GetLatestPublicationsBySourceRequest(), cancellationToken))
+            .CacheOutput();
 
         return app;
     }
