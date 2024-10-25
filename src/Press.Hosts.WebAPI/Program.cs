@@ -31,11 +31,7 @@ builder.Services
 
 builder.Services
     .AddAuthentication()
-    .AddJwtBearer(opts =>
-    {
-        opts.Authority = "https://alertadiario.kinde.com";
-        opts.TokenValidationParameters.ValidateAudience = false;
-    });
+    .AddJwtBearer(builder.Configuration.GetSection("Authorization:Jwt").Bind);
 
 builder.Services.AddAuthorization();
 
