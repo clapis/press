@@ -1,3 +1,4 @@
+using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Polly;
 using Polly.Retry;
@@ -12,9 +13,19 @@ public static class Module
         return services
             .AddHttpClient()
             .AddPollyPipelines()
-            .AddTransient<ISourcePublicationProvider, Franca.SourcePublicationProvider>()
-            .AddTransient<ISourcePublicationProvider, SaoCarlos.SourcePublicationProvider>()
-            .AddTransient<ISourcePublicationProvider, Sorocaba.SourcePublicationProvider>();
+            .AddPublicationProviders();
+    }
+
+    private static IServiceCollection AddPublicationProviders(this IServiceCollection services)
+    {
+        Assembly.GetExecutingAssembly()
+            .GetTypes()
+            .Where(x => x is { IsClass: true, IsAbstract: false })
+            .Where(x => x.IsAssignableTo(typeof(ISourcePublicationProvider)))
+            .ToList()
+            .ForEach(provider => services.AddTransient(typeof(ISourcePublicationProvider), provider));
+
+        return services;
     }
 
     private static IServiceCollection AddPollyPipelines(this IServiceCollection services)

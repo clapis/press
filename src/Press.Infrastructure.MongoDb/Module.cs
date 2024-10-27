@@ -31,7 +31,8 @@ public static class Module
             .AddSingleton<IPublicationStore, PublicationStore>();
 
         services
-            .AddHostedService<Indexes>();
+            .AddHostedService<Indexes>()
+            .AddHostedService<RegisterSources>();
 
         return services;
     }

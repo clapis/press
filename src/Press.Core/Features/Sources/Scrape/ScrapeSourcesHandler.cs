@@ -1,14 +1,13 @@
 using MediatR;
-using Microsoft.Extensions.Logging;
 using Press.Core.Infrastructure.Data;
 
 namespace Press.Core.Features.Sources.Scrape;
 
 public record ScrapeSourcesRequest : IRequest;
+
 public class ScrapeSourcesHandler(
     ISourceStore store,
-    ScrappingService service,
-    ILogger<ScrapeSourcesHandler> logger)
+    ScrappingService service)
     : IRequestHandler<ScrapeSourcesRequest>
 {
     public async Task Handle(ScrapeSourcesRequest request, CancellationToken cancellationToken)
