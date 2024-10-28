@@ -4,7 +4,7 @@
 # Allow files and directories
 !*.sln
 !/src/**
-!/tests/**
+!/test/**
 !Directory.Build.props
 
 
