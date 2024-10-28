@@ -47,9 +47,11 @@ if (app.Environment.IsDevelopment())
 
 app.UseOutputCache();
 
+app.MapHealthChecks("/healthz");
+
 app.MapAlertEndpoints()
-    .MapPublicationEndpoints()
-    .MapHealthChecks("/healthz");
+    .MapSourceEndpoints()
+    .MapPublicationEndpoints();
 
 app.Run();
 

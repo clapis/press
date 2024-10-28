@@ -51,6 +51,7 @@ internal class PublicationStore(IMongoCollection<Publication> publications) : IP
                 SourceId = x.SourceId,
                 CreatedOn = x.CreatedOn
             })
+            .OrderBy(x => x.SourceId)
             .ToListAsync(cancellationToken);
     }
 }
