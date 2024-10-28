@@ -4,7 +4,7 @@ using MongoDB.Bson.Serialization.IdGenerators;
 using MongoDB.Bson.Serialization.Serializers;
 using Press.Core.Domain;
 
-namespace Press.Infrastructure.MongoDb;
+namespace Press.Infrastructure.MongoDb.Configuration;
 
 internal static class BsonClassMappings
 {

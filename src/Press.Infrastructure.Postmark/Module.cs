@@ -1,6 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
 using Press.Core.Infrastructure;
-using Press.Infrastructure.Postmark.Configuration;
 using Press.Infrastructure.Postmark.Services;
 
 namespace Press.Infrastructure.Postmark;

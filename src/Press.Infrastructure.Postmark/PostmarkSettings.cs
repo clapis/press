@@ -1,4 +1,4 @@
-namespace Press.Infrastructure.Postmark.Configuration;
+namespace Press.Infrastructure.Postmark;
 
 public record PostmarkSettings
 {

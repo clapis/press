@@ -4,6 +4,8 @@ using Press.Core.Infrastructure.Data;
 
 namespace Press.Core.Features.System.MonitorDelay;
 
+public record MonitorDelayRequest() : IRequest;
+
 public class MonitorDelayHandler(
     IPublicationStore publicationStore, 
     INotificationService notificationService) 
@@ -13,7 +15,7 @@ public class MonitorDelayHandler(
     
     public async Task Handle(MonitorDelayRequest delayRequest, CancellationToken cancellationToken)
     {
-        var latest = await publicationStore.GetLatestPublicationsBySourceAsync(cancellationToken);
+        var latest = await publicationStore.GetLatestBySourceAsync(cancellationToken);
 
         var delayed = latest
             .Where(x => DateTime.UtcNow - x.CreatedOn > MaxPublicationAge)

@@ -1,12 +1,24 @@
 using MediatR;
 using Press.Core.Domain;
+using Press.Core.Infrastructure.Cache;
 using Press.Core.Infrastructure.Data;
 
 namespace Press.Core.Features.Publications.GetLatestBySource;
 
-public class GetLatestPublicationsBySourceHandler(IPublicationStore store) 
-    : IRequestHandler<GetLatestPublicationsBySourceRequest, List<Publication>>
+public record GetLatestPublicationsBySourceRequest : IRequest<IReadOnlyCollection<GetLatestPublicationsBySourceResponseItem>>;
+public record GetLatestPublicationsBySourceResponseItem(string Id, string Url, string Source, DateTime Date);
+
+public class GetLatestPublicationsBySourceHandler(IPublicationStore publications, ICachedSourceStore cache) 
+    : IRequestHandler<GetLatestPublicationsBySourceRequest, IReadOnlyCollection<GetLatestPublicationsBySourceResponseItem>>
 {
-    public async Task<List<Publication>> Handle(GetLatestPublicationsBySourceRequest request, CancellationToken cancellationToken) 
-        => await store.GetLatestPublicationsBySourceAsync(cancellationToken);
+    public async Task<IReadOnlyCollection<GetLatestPublicationsBySourceResponseItem>> Handle(GetLatestPublicationsBySourceRequest request, CancellationToken cancellationToken)
+    {
+        var sources = await cache.GetSourceMapAsync(cancellationToken);
+        var results = await publications.GetLatestBySourceAsync(cancellationToken);
+        
+        return results.Select(x => Map(x, sources[x.SourceId])).ToList();
+    }
+
+    private GetLatestPublicationsBySourceResponseItem Map(Publication publication, Source source)
+        => new(publication.Id, publication.Url, source.Name, publication.Date);
 }

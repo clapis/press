@@ -3,9 +3,7 @@ using Press.Hosts.WebAPI.Endpoints;
 using Press.Hosts.WebAPI.Jobs;
 using Press.Hosts.WebAPI.OpenTelemetry;
 using Press.Infrastructure.MongoDb;
-using Press.Infrastructure.MongoDb.Configuration;
 using Press.Infrastructure.Postmark;
-using Press.Infrastructure.Postmark.Configuration;
 using Press.Infrastructure.Scrapers;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -50,7 +48,6 @@ app.UseOutputCache();
 app.MapHealthChecks("/healthz");
 
 app.MapAlertEndpoints()
-    .MapSourceEndpoints()
     .MapPublicationEndpoints();
 
 app.Run();

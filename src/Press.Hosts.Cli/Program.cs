@@ -10,9 +10,7 @@ using Press.Core.Features.Publications.Search;
 using Press.Core.Features.Sources.Scrape;
 using Press.Hosts.Cli.Extensions;
 using Press.Infrastructure.MongoDb;
-using Press.Infrastructure.MongoDb.Configuration;
 using Press.Infrastructure.Postmark;
-using Press.Infrastructure.Postmark.Configuration;
 using Press.Infrastructure.Scrapers;
 
 await BuildCommandLine()
@@ -48,7 +46,7 @@ static CommandLineBuilder BuildCommandLine()
         .AddSubcommand("sources", opts => opts
             .AddSubcommand<ScrapeSourcesRequest>("scrape", "Scrapes a given source for new publications"))
         .AddSubcommand("publications", opts => opts
-            .AddSubcommand<PublicationsSearchRequest>("search", "Search scraped publications for a given term")
+            .AddSubcommand<SearchPublicationsRequest>("search", "Search scraped publications for a given term")
             .AddSubcommand<GetLatestPublicationsBySourceRequest>("latest", "Returns latest publications by source"));
 
     return new CommandLineBuilder(root);

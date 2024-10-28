@@ -4,6 +4,7 @@ using MongoDB.Driver.Core.Extensions.DiagnosticSources;
 using Press.Core.Domain;
 using Press.Core.Infrastructure.Data;
 using Press.Infrastructure.MongoDb.Configuration;
+using Press.Infrastructure.MongoDb.Hosted;
 using Press.Infrastructure.MongoDb.Stores;
 
 namespace Press.Infrastructure.MongoDb;

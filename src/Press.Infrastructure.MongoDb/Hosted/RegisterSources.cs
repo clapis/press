@@ -2,7 +2,7 @@ using Microsoft.Extensions.Hosting;
 using MongoDB.Driver;
 using Press.Core.Domain;
 
-namespace Press.Infrastructure.MongoDb;
+namespace Press.Infrastructure.MongoDb.Hosted;
 
 public class RegisterSources(IMongoCollection<Source> collection) : IHostedService
 {

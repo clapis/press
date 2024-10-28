@@ -4,7 +4,6 @@ using Microsoft.Extensions.Logging;
 using PostmarkDotNet;
 using Press.Core.Domain;
 using Press.Core.Infrastructure;
-using Press.Infrastructure.Postmark.Configuration;
 
 namespace Press.Infrastructure.Postmark.Services;
 

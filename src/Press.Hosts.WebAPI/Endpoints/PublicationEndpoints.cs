@@ -13,7 +13,7 @@ public static class PublicationEndpoints
         
         group.MapGet("/search",
             async ([FromServices] IMediator mediator, [FromQuery(Name = "q")] string query, CancellationToken cancellationToken)
-                => await mediator.Send(new PublicationsSearchRequest(query), cancellationToken));
+                => await mediator.Send(new SearchPublicationsRequest(query), cancellationToken));
 
         group.MapGet("/latest",
             async ([FromServices] IMediator mediator, CancellationToken cancellationToken)

@@ -1,4 +1,4 @@
-namespace Press.Infrastructure.MongoDb.Configuration;
+namespace Press.Infrastructure.MongoDb;
 
 public class MongoDbSettings
 {
