@@ -20,6 +20,10 @@ public static class Module
             .AddMongoDatabase("press");
 
         services
+            .AddMongoCollection<User>("users")
+            .AddTransient<IUserStore, UserStore>();
+
+        services
             .AddMongoCollection<Alert>("alerts")
             .AddSingleton<IAlertStore, AlertStore>();
 
