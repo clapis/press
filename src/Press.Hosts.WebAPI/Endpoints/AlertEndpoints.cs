@@ -17,13 +17,13 @@ public static class AlertEndpoints
         group.RequireAuthorization();
 
         group.MapGet("/", async ([FromServices] IMediator mediator, ClaimsPrincipal principal, CancellationToken cancellationToken)
-            => await mediator.Send(new GetAlertsRequest(principal.GetEmail()), cancellationToken));
+            => await mediator.Send(new GetAlertsRequest(principal.GetUserId()), cancellationToken));
         
         group.MapPost("/", async ([FromBody] CreateAlertModel model, [FromServices] IMediator mediator, ClaimsPrincipal principal, CancellationToken cancellationToken)
-            => await mediator.Send(new CreateAlertRequest(model.Keyword, principal.GetEmail()), cancellationToken));
+            => await mediator.Send(new CreateAlertRequest(model.Keyword, principal.GetUserId()), cancellationToken));
         
         group.MapDelete("/{id}", async (string id, [FromServices] IMediator mediator, ClaimsPrincipal principal, CancellationToken cancellationToken)
-            => await mediator.Send(new DeleteAlertRequest(id, principal.GetEmail()), cancellationToken));
+            => await mediator.Send(new DeleteAlertRequest(id, principal.GetUserId()), cancellationToken));
 
         return app;
     }

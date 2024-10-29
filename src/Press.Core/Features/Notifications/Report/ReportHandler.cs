@@ -6,6 +6,7 @@ using Press.Core.Infrastructure.Data;
 namespace Press.Core.Features.Notifications.Report;
 
 public class ReportHandler(
+    IUserStore userStore,
     IAlertStore alertStore,
     IPublicationStore publicationStore,
     INotificationService notificationService)
@@ -13,14 +14,15 @@ public class ReportHandler(
 {
     public async Task Handle(ReportRequest request, CancellationToken cancellationToken)
     {
-        var alerts = await alertStore.GetAllAsync(cancellationToken);
+        var users = await userStore.GetAllAsync(cancellationToken);
 
-        foreach (var alertsByNotificationEmail in alerts.GroupBy(x => x.NotifyEmail))
+        foreach (var user in users)
         {
-            var email = alertsByNotificationEmail.Key;
             var report = new Dictionary<Domain.Alert, List<Publication>>();
+
+            var alerts = await alertStore.GetByUserIdAsync(user.Id, cancellationToken);
             
-            foreach (var alert in alertsByNotificationEmail)
+            foreach (var alert in alerts)
             {
                 var pubs = await publicationStore.SearchAsync(alert.Term, cancellationToken);
 
@@ -32,7 +34,7 @@ public class ReportHandler(
 
             if (!report.Any()) continue;
             
-            await notificationService.SendReportAsync(email, report, cancellationToken);
+            await notificationService.SendReportAsync(user, report, cancellationToken);
         }
     }
 }

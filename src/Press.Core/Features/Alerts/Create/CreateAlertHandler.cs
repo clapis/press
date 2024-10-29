@@ -11,7 +11,7 @@ public class CreateAlertHandler(IAlertStore store) : IRequestHandler<CreateAlert
         var alert = new Alert
         {
             Term = request.Keyword, 
-            NotifyEmail = request.UserId
+            UserId = request.UserId
         };
 
         await store.InsertAsync(alert, cancellationToken);

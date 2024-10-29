@@ -1,6 +1,5 @@
 using AngleSharp;
 using AngleSharp.Html.Dom;
-using Microsoft.Extensions.Logging;
 using Polly.Registry;
 using Press.Core.Domain;
 using Press.Core.Infrastructure.Scrapers;
@@ -8,7 +7,6 @@ using Press.Core.Infrastructure.Scrapers;
 namespace Press.Infrastructure.Scrapers.SaoCarlos;
 
 public class SourcePublicationProvider(
-    ILogger<SourcePublicationProvider> logger,
     ResiliencePipelineProvider<string> polly
     ) : ISourcePublicationProvider
 {

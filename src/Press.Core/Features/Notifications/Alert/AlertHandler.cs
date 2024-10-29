@@ -5,6 +5,7 @@ using Press.Core.Infrastructure.Data;
 namespace Press.Core.Features.Notifications.Alert;
 
 public class AlertHandler(
+    IUserStore userStore,
     IAlertStore alertStore,
     IPublicationStore publicationStore,
     INotificationService notificationService)
@@ -12,23 +13,28 @@ public class AlertHandler(
 {
     public async Task Handle(AlertRequest request, CancellationToken cancellationToken)
     {
-        var alerts = await alertStore.GetAllAsync(cancellationToken);
+        var users = await userStore.GetAllAsync(cancellationToken);
 
-        foreach (var alert in alerts)
+        foreach (var user in users)
         {
-            var pubs = await publicationStore.SearchAsync(alert.Term, cancellationToken);
+            var alerts = await alertStore.GetByUserIdAsync(user.Id, cancellationToken);
 
-            var last = alert.LastNotification ?? DateTime.MinValue;
+            foreach (var alert in alerts)
+            {
+                var pubs = await publicationStore.SearchAsync(alert.Term, cancellationToken);
 
-            var notifications = pubs.Where(p => p.CreatedOn > last).ToList();
+                var last = alert.LastNotification ?? DateTime.MinValue;
 
-            if (!notifications.Any()) continue;
+                var notifications = pubs.Where(p => p.CreatedOn > last).ToList();
 
-            await notificationService.SendAlertAsync(alert, notifications, cancellationToken);
+                if (!notifications.Any()) continue;
+                
+                await notificationService.SendAlertAsync(user, alert, notifications, cancellationToken);
 
-            alert.LastNotification = notifications.Max(x => x.CreatedOn);
+                alert.LastNotification = notifications.Max(x => x.CreatedOn);
 
-            await alertStore.UpdateAsync(alert, cancellationToken);
+                await alertStore.UpdateAsync(alert, cancellationToken);
+            }
         }
     }
 }

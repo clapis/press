@@ -22,22 +22,21 @@ public class NotificationService : INotificationService
         _client = new PostmarkClient(_settings.ApiToken);
     }
 
-    public async Task SendAlertAsync(Alert alert, List<Publication> publications, CancellationToken cancellationToken)
+    public async Task SendAlertAsync(User user, Alert alert, List<Publication> publications, CancellationToken cancellationToken)
     {
-        var email = alert.NotifyEmail;
-        var subject = $"Alerta: {alert.Term}";
+        var subject = $"{alert.Term}";
 
         var body = new StringBuilder();
         body.AppendLine($"Termo '{alert.Term}' encontrado em:");
         body.AppendLine();
         publications.ForEach(pub => body.AppendLine($"{pub.Date:dd/MM/yyyy}: {pub.Url}"));
         body.AppendLine();
-        body.AppendLine("Ciao, :)");
+        body.AppendLine("Até mais, :)");
 
-        await NotifyAsync(email, subject, body.ToString(), cancellationToken);
+        await NotifyAsync(user.Email, subject, body.ToString(), cancellationToken);
     }
 
-    public async Task SendReportAsync(string email, Dictionary<Alert, List<Publication>> report, CancellationToken cancellationToken)
+    public async Task SendReportAsync(User user, Dictionary<Alert, List<Publication>> report, CancellationToken cancellationToken)
     {
         var subject = "Resumo semanal";
 
@@ -56,9 +55,9 @@ public class NotificationService : INotificationService
         }
         
         body.AppendLine();
-        body.AppendLine("Ciao, :)");
+        body.AppendLine("Até mais, :)");
 
-        await NotifyAsync(email, subject, body.ToString(), cancellationToken);
+        await NotifyAsync(user.Email, subject, body.ToString(), cancellationToken);
     }
 
     public async Task SendDelayNotificationAsync(List<Publication> publications, CancellationToken cancellationToken)
