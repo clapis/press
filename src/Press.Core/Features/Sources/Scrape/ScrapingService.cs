@@ -4,33 +4,30 @@ using Press.Core.Infrastructure.Data;
 
 namespace Press.Core.Features.Sources.Scrape;
 
-public class ScrappingService(
+public class ScrapingService(
     IPublicationStore store,
     IPublicationProvider provider, 
     IPdfContentExtractor extractor,
-    ILogger<ScrappingService> logger)
+    ILogger<ScrapingService> logger)
 {
     public async Task ScrapeAsync(Source source, CancellationToken cancellationToken)
     {
-        // Retrieve latest publication urls, so that we process only what's new
-        var urls = await store.GetLatestUrlsAsync(source, cancellationToken);
-        var stored = new HashSet<string>(urls, StringComparer.OrdinalIgnoreCase);
-
         // Scrape source for latest publications
         var publications = await provider.ProvideAsync(source, cancellationToken);
+        
+        // Retrieve latest publication already previously scraped
+        var stored = await store.GetLatestUrlsAsync(source, cancellationToken);
 
-        // Extract contents of new publications
-        foreach (var publication in publications.Where(publication => !stored.Contains(publication.Url)))
+        // Extract contents of new publications only
+        foreach (var publication in publications.ExceptBy(stored, x => x.Url))
         {
-            var contents = await extractor.ExtractAsync(publication.Url, cancellationToken);
-
-            publication.Contents = contents;
+            publication.Contents = await extractor.ExtractAsync(publication.Url, cancellationToken);
 
             await store.SaveAsync(publication, cancellationToken);
 
             logger.LogInformation("New publication scraped {Url}", publication.Url);
             
-            if (string.IsNullOrWhiteSpace(contents))
+            if (string.IsNullOrWhiteSpace(publication.Contents))
                 logger.LogWarning("Publication has no contents {Url}", publication.Url);
         }
     }}

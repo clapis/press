@@ -15,7 +15,7 @@ public static class Module
             => x.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
         services
-            .AddTransient<ScrappingService>()
+            .AddTransient<ScrapingService>()
             .AddTransient<IPdfContentExtractor, PigExtractor>()
             .AddTransient<ICachedSourceStore, CachedSourceStore>()
             .AddTransient<IPublicationProvider, PublicationProvider>();

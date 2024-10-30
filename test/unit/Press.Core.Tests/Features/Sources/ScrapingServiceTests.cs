@@ -6,17 +6,17 @@ using Press.Core.Infrastructure.Data;
 
 namespace Press.Core.Tests.Features.Sources;
 
-public class ScrappingServiceTests
+public class ScrapingServiceTests
 {
-    private readonly ScrappingService _target;
+    private readonly ScrapingService _target;
 
     private readonly Mock<IPublicationStore> _store = new();
     private readonly Mock<IPublicationProvider> _provider = new();
     private readonly Mock<IPdfContentExtractor> _extractor = new();
 
-    public ScrappingServiceTests()
+    public ScrapingServiceTests()
     {
-        _target = new ScrappingService(_store.Object, _provider.Object, _extractor.Object, NullLogger<ScrappingService>.Instance);
+        _target = new ScrapingService(_store.Object, _provider.Object, _extractor.Object, NullLogger<ScrapingService>.Instance);
     }
 
     [Fact(DisplayName = "When a document has already been scraped, skip it")]

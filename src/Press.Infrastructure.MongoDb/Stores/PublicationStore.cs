@@ -11,7 +11,7 @@ internal class PublicationStore(IMongoCollection<Publication> publications) : IP
     public async Task<List<string>> GetLatestUrlsAsync(Source source, CancellationToken cancellationToken) 
         => await publications.Find(x => x.SourceId == source.Id)
             .SortByDescending(x => x.Date)
-            .Limit(1000)
+            .Limit(500)
             .Project(x => x.Url)
             .ToListAsync(cancellationToken);
 

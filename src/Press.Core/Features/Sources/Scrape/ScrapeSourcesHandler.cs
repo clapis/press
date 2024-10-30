@@ -1,4 +1,7 @@
+using System.Diagnostics;
 using MediatR;
+using Microsoft.Extensions.Logging;
+using Press.Core.Domain;
 using Press.Core.Infrastructure.Data;
 
 namespace Press.Core.Features.Sources.Scrape;
@@ -7,15 +10,39 @@ public record ScrapeSourcesRequest : IRequest;
 
 public class ScrapeSourcesHandler(
     ISourceStore store,
-    ScrappingService service)
+    ScrapingService service,
+    ILogger<ScrapeSourcesHandler> logger)
     : IRequestHandler<ScrapeSourcesRequest>
 {
     public async Task Handle(ScrapeSourcesRequest request, CancellationToken cancellationToken)
     {
         var sources = await store.GetAllAsync(cancellationToken);
 
-        await Task.WhenAll(sources
-            .Where(x => x.IsEnabled)
-            .Select(source => service.ScrapeAsync(source, cancellationToken)));
+        // do this sequentially - we're mindful of memory and not in a rush
+        foreach (var source in sources)
+            await ScrapeSourceAsync(source, cancellationToken);
+    }
+
+    private async Task ScrapeSourceAsync(Source source, CancellationToken cancellationToken)
+    {
+        var sw = Stopwatch.StartNew();
+
+        try
+        {
+            if (!source.IsEnabled)
+            {
+                logger.LogInformation("Scraping: {Source} is disabled, skipping.", source.Name);
+                return;
+            }
+
+            await service.ScrapeAsync(source, cancellationToken);
+            
+            logger.LogInformation("Scraping: {Source} completed after {Duration} ms", source.Name, sw.ElapsedMilliseconds);
+
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Scraping: {Source} failed after {Duration} ms", source.Name, sw.ElapsedMilliseconds);
+        }
     }
 }

@@ -46,12 +46,6 @@ public static class OpenTelemetryExtensions
                 activity.SetTag("http.request.uri", message.RequestUri);
                 activity.SetTag("http.request.user_agent", message.Headers.UserAgent);
             };
-            
-            opts.EnrichWithHttpResponseMessage = (activity, message) =>
-            {
-                activity.SetTag("http.response.headers.location", message.Headers.Location);
-            }; 
-
         })
         .AddSource("MongoDB.Driver.Core.Extensions.DiagnosticSources");
 }
