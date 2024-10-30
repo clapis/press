@@ -1,7 +1,7 @@
 using Press.Core.Features.Notifications.Alert;
 using Press.Core.Features.Notifications.Report;
 using Press.Core.Features.Sources.Scrape;
-using Press.Core.Features.System.MonitorDelay;
+using Press.Core.Features.System.MonitorStaleSource;
 using Quartz;
 
 namespace Press.Hosts.WebAPI.Jobs;
@@ -14,7 +14,7 @@ public static class QuartzExtensions
         {
             quartz.AddJobAndTrigger<MediatrJob<AlertRequest>>("0 15 0,16,20 * * ?");
             quartz.AddJobAndTrigger<MediatrJob<ReportRequest>>("0 0 12 ? * SAT");
-            quartz.AddJobAndTrigger<MediatrJob<MonitorDelayRequest>>("0 0 12 * * ?");
+            quartz.AddJobAndTrigger<MediatrJob<MonitorStaleSource>>("0 0 12 * * ?");
             quartz.AddJobAndTrigger<MediatrJob<ScrapeSourcesRequest>>("0 0 0,16,20 * * ?");
         });
 

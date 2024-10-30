@@ -6,5 +6,5 @@ public interface INotificationService
 {
     Task SendAlertAsync(User user, Alert alert, List<Publication> publications, CancellationToken cancellationToken);
     Task SendReportAsync(User user, Dictionary<Alert, List<Publication>> report, CancellationToken cancellationToken);
-    Task SendDelayNotificationAsync(List<Publication> delayed, CancellationToken cancellationToken);
+    Task NotifyStaleSourcesAsync(Dictionary<Source, DateTime> stale, CancellationToken cancellationToken);
 }

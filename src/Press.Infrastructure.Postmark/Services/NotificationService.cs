@@ -60,14 +60,18 @@ public class NotificationService : INotificationService
         await NotifyAsync(user.Email, subject, body.ToString(), cancellationToken);
     }
 
-    public async Task SendDelayNotificationAsync(List<Publication> publications, CancellationToken cancellationToken)
+    public async Task NotifyStaleSourcesAsync(Dictionary<Source, DateTime> stale, CancellationToken cancellationToken)
     {
-        var subject = "Atraso";
+        var subject = "System: Stale Sources";
 
         var body = new StringBuilder();
-        body.AppendLine("Últimas:");
         body.AppendLine();
-        publications.ForEach(pub => body.AppendLine($"{pub.Date:dd/MM/yyyy}: {pub.Url}"));
+        foreach (var (source, last) in stale)
+        {
+            body.AppendLine($"{source.Name}: {last:dd/MM/yyyy}");
+            body.AppendLine(source.Url);
+            body.AppendLine();
+        }
         body.AppendLine();
         body.AppendLine("Ciao, :)");
 
