@@ -1,29 +1,25 @@
 using Press.Core;
 using Press.Hosts.WebAPI.Endpoints;
 using Press.Hosts.WebAPI.Jobs;
-using Press.Hosts.WebAPI.OpenTelemetry;
+using Press.Hosts.WebAPI.Telemetry;
 using Press.Infrastructure.MongoDb;
 using Press.Infrastructure.Postmark;
 using Press.Infrastructure.Scrapers;
 
 var builder = WebApplication.CreateBuilder(args);
 
-T GetSettings<T>(string key) => builder.Configuration.GetRequiredSection(key).Get<T>()!;
-
 builder.Services
     .AddCore()
     .AddScrapers()
     .AddQuartzJobs()
     .AddMongoDb(GetSettings<MongoDbSettings>("MongoDb"))
-    .AddPostmark(GetSettings<PostmarkSettings>("Postmark"));
+    .AddPostmark(GetSettings<PostmarkSettings>("Postmark"))
+    .AddTelemetry(GetSettings<TelemetryOptions>("Telemetry"));
 
 builder.Services
     .AddAuthorization()
     .AddAuthentication()
     .AddJwtBearer(builder.Configuration.GetSection("Authorization:Jwt").Bind);
-
-builder.Services
-    .AddOpenTelemetry(GetSettings<GrafanaCloudOptions>("Grafana"));
 
 builder.Services
     .AddHealthChecks();
@@ -34,6 +30,8 @@ builder.Services
 
 builder.Services
     .AddOutputCache();
+
+T GetSettings<T>(string key) => builder.Configuration.GetRequiredSection(key).Get<T>()!;
 
 var app = builder.Build();
 

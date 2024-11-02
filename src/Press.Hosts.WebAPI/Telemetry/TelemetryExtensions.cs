@@ -1,31 +1,33 @@
-using System.Text.Json;
+using OpenTelemetry.Exporter;
+using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 
-namespace Press.Hosts.WebAPI.OpenTelemetry;
+namespace Press.Hosts.WebAPI.Telemetry;
 
-public static class OpenTelemetryExtensions
+public static class TelemetryExtensions
 {
-    public static IServiceCollection AddOpenTelemetry(this IServiceCollection services, GrafanaCloudOptions options)
+    public static IServiceCollection AddTelemetry(this IServiceCollection services, TelemetryOptions options)
     {
         if (!options.IsEnabled) return services;
-        
+
         services
-            .ConfigureGrafanaCloudExporter(options);
+            .Configure<OtlpExporterOptions>(opts => opts.Endpoint = options.Endpoint);
 
         services.AddOpenTelemetry()
-            .ConfigureResource(resource => resource.AddService("press"))
+            .ConfigureResource(resource => resource.AddService(options.ServiceName))
             .WithTracing(tracer => tracer
                 .AddInstrumentation()
-                .AddGrafanaCloudExporter())
+                .AddOtlpExporter())
             .WithMetrics(meter => meter
                 .AddInstrumentation()
-                .AddGrafanaCloudExporter());
-        
-        services
-            .AddLogging(x => x.AddOpenTelemetry(logger => logger
-                .AddGrafanaCloudExporter()));
+                .AddOtlpExporter());
+
+        services.AddLogging(opts => opts
+            .ClearProviders()
+            .AddConsole()
+            .AddOpenTelemetry(log => log.AddOtlpExporter()));
 
         return services;
     }
