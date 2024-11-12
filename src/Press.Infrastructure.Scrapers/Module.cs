@@ -34,8 +34,8 @@ public static class Module
         {
             builder.AddRetry(new RetryStrategyOptions<List<string>>()
             {
-                MaxRetryAttempts = 3,
-                Delay = TimeSpan.FromSeconds(2),
+                MaxRetryAttempts = 1,
+                Delay = TimeSpan.FromSeconds(1),
                 BackoffType = DelayBackoffType.Exponential,
                 ShouldHandle = new PredicateBuilder<List<string>>()
                     .HandleResult(x => x.Count == 0)

@@ -1,3 +1,4 @@
+using System.Net;
 using AngleSharp;
 using AngleSharp.Html.Dom;
 using Polly.Registry;
@@ -55,6 +56,9 @@ public class SourcePublicationProvider(
         var config = Configuration.Default.WithDefaultLoader();
         var context = BrowsingContext.New(config);
         var document = await context.OpenAsync(url, cancellationToken);
+
+        if (document.StatusCode != HttpStatusCode.OK)
+            throw new Exception($"Unexpected status code {document.StatusCode}");
 
         var links = document
             .QuerySelectorAll("a")
