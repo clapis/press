@@ -1,14 +1,19 @@
-using System.Net;
+using System.Globalization;
+using System.Text.RegularExpressions;
 using AngleSharp;
 using AngleSharp.Html.Dom;
+using Microsoft.Extensions.Logging;
 using Polly.Registry;
 using Press.Core.Domain;
 using Press.Core.Infrastructure.Scrapers;
+using Press.Infrastructure.Scrapers.Extensions;
 
-namespace Press.Infrastructure.Scrapers.SaoCarlos;
+namespace Press.Infrastructure.Scrapers.Providers.SaoCarlos;
 
 public class SourcePublicationProvider(
-    ResiliencePipelineProvider<string> polly
+    HttpClient httpClient,
+    ResiliencePipelineProvider<string> polly,
+    ILogger<SourcePublicationProvider> logger
     ) : ISourcePublicationProvider
 {
     public string SourceId => "dom_sp_sao_carlos";
@@ -19,14 +24,14 @@ public class SourcePublicationProvider(
         
         foreach (var page in Pages())
         {
-            var links = await ScrapePageLinksAsync(page, cancellationToken);
+            var links = await ScrapePageLinksAsync(Page(DateTime.Today), cancellationToken);
 
             publications.AddRange(links
                 .Select(link => new Publication
                 {
                     Url = link,
                     SourceId = SourceId,
-                    Date = DateTime.UtcNow.Date
+                    Date = GetDateFrom(link)
                 }));
         }
 
@@ -36,29 +41,27 @@ public class SourcePublicationProvider(
     private static IEnumerable<string> Pages()
     {
         // current & previous month
-        yield return Page(DateTime.Today);
         yield return Page(DateTime.Today.AddMonths(-1));
+        yield return Page(DateTime.Today);
     }
 
     private static string Page(DateTime date)
-        => $"http://www.saocarlos.sp.gov.br/index.php/diario-oficial-{date.Year}/diario-oficial-{MapMonth(date)}-{date.Year}.html";
+        => $"http://www.saocarlos.sp.gov.br/index.php/diario-oficial-{date.Year}/diario-oficial-{date.GetMonthNamePT_BR()}-{date.Year}.html";
 
     private async Task<List<string>> ScrapePageLinksAsync(string url, CancellationToken cancellationToken)
     {
         var policy = polly.GetPipeline<List<string>>("no-links");
-
+        
         return await policy.ExecuteAsync(async token 
             => await ScrapePageLinksCoreAsync(url, token), cancellationToken);
     }
 
     private async Task<List<string>> ScrapePageLinksCoreAsync(string url, CancellationToken cancellationToken)
     {
-        var config = Configuration.Default.WithDefaultLoader();
-        var context = BrowsingContext.New(config);
-        var document = await context.OpenAsync(url, cancellationToken);
-
-        if (document.StatusCode != HttpStatusCode.OK)
-            throw new Exception($"Unexpected status code {document.StatusCode}");
+        var content = await httpClient.GetStringAsync(url, cancellationToken);
+        
+        var document = await BrowsingContext.New()
+            .OpenAsync(req => req.Content(content), cancellationToken);
 
         var links = document
             .QuerySelectorAll("a")
@@ -72,23 +75,13 @@ public class SourcePublicationProvider(
         return links;
     }
 
-    private static string MapMonth(DateTime date)
+    private static DateTime GetDateFrom(string url)
     {
-        return date.Month switch
-        {
-            01 => "janeiro",
-            02 => "fevereiro",
-            03 => "marco",
-            04 => "abril",
-            05 => "maio",
-            06 => "junho",
-            07 => "julho",
-            08 => "agosto",
-            09 => "setembro",
-            10 => "outubro",
-            11 => "novembro",
-            12 => "dezembro",
-            _ => throw new ArgumentOutOfRangeException($"month '{date.Month}'")
-        };
+        var match = Regex.Match(url, @"\d{2}-\d{2}-\d{4}");
+
+        if (match.Success && DateTime.TryParseExact(match.Value, "dd-MM-yyyy", null, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal, out var result))
+            return result;
+
+        return DateTime.UtcNow;
     }
 }

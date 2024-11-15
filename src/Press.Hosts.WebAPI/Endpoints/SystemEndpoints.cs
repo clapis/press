@@ -10,11 +10,10 @@ public static class SystemEndpoints
     {
         var group = app.MapGroup("/system");
         
-        group.MapPost("/scrape",
-            async ([FromServices] IMediator mediator, CancellationToken cancellationToken)
-                => await mediator.Send(new ScrapeSourcesRequest(), cancellationToken));
+        group.MapPost("/scrape/{id}",
+            async ([FromServices] IMediator mediator, string id, CancellationToken cancellationToken)
+                => await mediator.Send(new ScrapeSourcesRequest { Ids = [id] }, cancellationToken));
 
         return app;
     }
-
 }

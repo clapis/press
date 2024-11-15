@@ -1,8 +1,9 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Press.Core.Domain;
 using Press.Core.Infrastructure.Scrapers;
 
-namespace Press.Infrastructure.Scrapers.Franca;
+namespace Press.Infrastructure.Scrapers.Providers.Franca;
 
 public class SourcePublicationProvider(HttpClient httpClient) : ISourcePublicationProvider
 {
@@ -36,10 +37,10 @@ public class SourcePublicationProvider(HttpClient httpClient) : ISourcePublicati
 
         var content = await response.Content.ReadAsStringAsync(cancellationToken);
 
-        if (string.IsNullOrEmpty(content)) return Enumerable.Empty<string>();
+        if (string.IsNullOrEmpty(content)) return [];
 
         return JsonSerializer.Deserialize<List<Entry>>(content)!
-            .Select(x => BuildPublicationLink(x.nome));
+            .Select(x => BuildPublicationLink(x.Filename));
     }
 
     private static IEnumerable<DateTime> Last7Days() 
@@ -51,5 +52,5 @@ public class SourcePublicationProvider(HttpClient httpClient) : ISourcePublicati
     private static string BuildPublicationLink(string filename) 
         => $"https://www.franca.sp.gov.br/arquivos/diario-oficial/documentos/{filename}";
 
-    private record Entry(string nome);
+    private record Entry([property: JsonPropertyName("nome")] string Filename);
 }

@@ -3,9 +3,8 @@ using System.Text.Json.Serialization;
 using Press.Core.Domain;
 using Press.Core.Infrastructure.Scrapers;
 
-namespace Press.Infrastructure.Scrapers.Xtra.DiarioOficial;
+namespace Press.Infrastructure.Scrapers.Providers.Xtra.DiarioOficial;
 
-// https://www.diariooficial.com.br/concursos-lista
 public class SourcePublicationProvider(HttpClient client) 
     : ISourcePublicationProvider
 {

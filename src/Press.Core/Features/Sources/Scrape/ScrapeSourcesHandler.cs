@@ -6,7 +6,10 @@ using Press.Core.Infrastructure.Data;
 
 namespace Press.Core.Features.Sources.Scrape;
 
-public record ScrapeSourcesRequest : IRequest;
+public record ScrapeSourcesRequest : IRequest
+{
+    public string[] Ids { get; init; } = [];
+}
 
 public class ScrapeSourcesHandler(
     ISourceStore store,
@@ -14,9 +17,13 @@ public class ScrapeSourcesHandler(
     ILogger<ScrapeSourcesHandler> logger)
     : IRequestHandler<ScrapeSourcesRequest>
 {
+    
     public async Task Handle(ScrapeSourcesRequest request, CancellationToken cancellationToken)
     {
         var sources = await store.GetAllAsync(cancellationToken);
+
+        if (request.Ids.Any())
+            sources = sources.IntersectBy(request.Ids, x => x.Id).ToList();
 
         // do this sequentially - we're mindful of memory and not in a rush
         foreach (var source in sources)

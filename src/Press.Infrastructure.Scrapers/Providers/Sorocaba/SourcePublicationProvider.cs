@@ -1,16 +1,17 @@
-using System.Net;
 using AngleSharp;
 using AngleSharp.Html.Dom;
-using AngleSharp.Io;
 using Microsoft.Extensions.Logging;
-using Polly;
-using Polly.Retry;
+using Polly.Registry;
 using Press.Core.Domain;
 using Press.Core.Infrastructure.Scrapers;
 
-namespace Press.Infrastructure.Scrapers.Sorocaba;
+namespace Press.Infrastructure.Scrapers.Providers.Sorocaba;
 
-public class SourcePublicationProvider(ILogger<SourcePublicationProvider> logger) : ISourcePublicationProvider
+public class SourcePublicationProvider(
+    HttpClient httpClient,
+    ResiliencePipelineProvider<string> polly,
+    ILogger<SourcePublicationProvider> logger) 
+    : ISourcePublicationProvider
 {
     public string SourceId => "dom_sp_sorocaba";
 
@@ -42,22 +43,7 @@ public class SourcePublicationProvider(ILogger<SourcePublicationProvider> logger
 
     private async Task<List<string>> ScrapePageLinksAsync(string url, CancellationToken cancellationToken)
     {
-        var policy = new ResiliencePipelineBuilder<List<string>>()
-            .AddRetry(new RetryStrategyOptions<List<string>>()
-            {
-                MaxRetryAttempts = 3,
-                Delay = TimeSpan.FromSeconds(2),
-                BackoffType = DelayBackoffType.Exponential,
-                ShouldHandle = new PredicateBuilder<List<string>>()
-                    .HandleResult(x => x.Count == 0),
-                OnRetry = _ =>
-                {
-                    logger.LogWarning("No links founds at {Url}, retrying..", url);
-
-                    return ValueTask.CompletedTask;
-                }
-            })
-            .Build();
+        var policy = polly.GetPipeline<List<string>>("no-links");
 
         return await policy.ExecuteAsync(async token 
             => await ScrapePageLinksCoreAsync(url, token), cancellationToken);
@@ -65,19 +51,10 @@ public class SourcePublicationProvider(ILogger<SourcePublicationProvider> logger
 
     private async Task<List<string>> ScrapePageLinksCoreAsync(string url, CancellationToken cancellationToken)
     {
-        var config = Configuration.Default
-            .With<IRequester>(_ => new DefaultHttpRequester("Mozilla/5.0", request =>
-            {
-                request.AllowAutoRedirect = true;
-                request.MaximumAutomaticRedirections = 3;
-            }))
-            .WithDefaultLoader();
+        var content = await httpClient.GetStringAsync(url, cancellationToken);
 
-        var context = BrowsingContext.New(config);
-        var document = await context.OpenAsync(url, cancellationToken);
-
-        if (document.StatusCode != HttpStatusCode.OK)
-            logger.LogWarning("Unexpected status code: {StatusCode}", document.StatusCode);
+        var document = await BrowsingContext.New()
+            .OpenAsync(req => req.Content(content), cancellationToken);
 
         var links = document
             .QuerySelectorAll("#jornal-home a")

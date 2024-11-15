@@ -1,3 +1,4 @@
+using System.Net;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Polly;
@@ -10,10 +11,24 @@ public static class Module
 {
     public static IServiceCollection AddScrapers(this IServiceCollection services)
     {
-        return services
-            .AddHttpClient()
+        services
+            .ConfigureHttpClientDefaults(builder => builder
+                .ConfigureHttpClient(client =>
+                {
+                    client.DefaultRequestHeaders.UserAgent.TryParseAdd(
+                        "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:15.0) Gecko/20100101 Firefox/15.0.1");
+                })
+                .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+                {
+                    UseProxy = true,
+                    Proxy = new WebProxy("socks5://openvpn-dante-proxy.openvpn-dante-proxy:1080")
+                }));
+            
+        services
             .AddPollyPipelines()
             .AddPublicationProviders();
+
+        return services;
     }
 
     private static IServiceCollection AddPublicationProviders(this IServiceCollection services)
