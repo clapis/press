@@ -11,6 +11,8 @@ COPY test/unit/*/*.csproj ./
 RUN for file in $(ls *.csproj); do mkdir -p test/unit/${file%.*}/ && mv $file test/unit/${file%.*}/; done
 COPY test/component/*/*.csproj ./
 RUN for file in $(ls *.csproj); do mkdir -p test/component/${file%.*}/ && mv $file test/component/${file%.*}/; done
+COPY perf/*/*.csproj ./
+RUN for file in $(ls *.csproj); do mkdir -p perf/${file%.*}/ && mv $file perf/${file%.*}/; done
 
 RUN dotnet restore -a $TARGETARCH
 

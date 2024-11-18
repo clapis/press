@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Polly;
 using Polly.Retry;
 using Press.Core.Infrastructure.Scrapers;
+using Press.Infrastructure.Scrapers.Extractors;
 
 namespace Press.Infrastructure.Scrapers;
 
@@ -27,6 +28,8 @@ public static class Module
         services
             .AddPollyPipelines()
             .AddPublicationProviders();
+        
+        services.AddTransient<IPdfContentExtractor, PdfContentExtractor>();
 
         return services;
     }

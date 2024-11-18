@@ -16,7 +16,6 @@ public static class Module
 
         services
             .AddTransient<ScrapingService>()
-            .AddTransient<IPdfContentExtractor, PigExtractor>()
             .AddTransient<ICachedSourceStore, CachedSourceStore>()
             .AddTransient<IPublicationProvider, PublicationProvider>();
 

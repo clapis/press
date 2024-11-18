@@ -32,6 +32,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Press.Hosts.WebAPI.Tests", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Press.Infrastructure.Scrapers.Tests", "test\unit\Press.Infrastructure.Scrapers.Tests\Press.Infrastructure.Scrapers.Tests.csproj", "{9D7CF680-6A02-463F-A389-3CF8754307B6}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "perf", "perf", "{B549535B-1DCE-47E1-8ED5-12F6B4AB2823}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Press.Benchmarks", "perf\Press.Benchmarks\Press.Benchmarks.csproj", "{8C436A64-6A45-4A2F-9E07-41702C47EABC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -74,6 +78,10 @@ Global
 		{9D7CF680-6A02-463F-A389-3CF8754307B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9D7CF680-6A02-463F-A389-3CF8754307B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9D7CF680-6A02-463F-A389-3CF8754307B6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8C436A64-6A45-4A2F-9E07-41702C47EABC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C436A64-6A45-4A2F-9E07-41702C47EABC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C436A64-6A45-4A2F-9E07-41702C47EABC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C436A64-6A45-4A2F-9E07-41702C47EABC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{C5B47203-BEE9-4307-9990-5397518199CD} = {EF359897-9873-419F-A992-5C79125A727E}
@@ -87,5 +95,6 @@ Global
 		{D7F84E2D-A06C-4F4F-9DFD-FC627B7D3E4B} = {3900DCB3-28CE-4DD5-9953-994152C581EB}
 		{531AE5B9-BD8D-4836-99BA-C7C4DEE8B314} = {04A44D94-1923-4E8D-BBBF-7C2B55FCA6C4}
 		{9D7CF680-6A02-463F-A389-3CF8754307B6} = {3900DCB3-28CE-4DD5-9953-994152C581EB}
+		{8C436A64-6A45-4A2F-9E07-41702C47EABC} = {B549535B-1DCE-47E1-8ED5-12F6B4AB2823}
 	EndGlobalSection
 EndGlobal

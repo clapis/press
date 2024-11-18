@@ -3,6 +3,7 @@ using Moq;
 using Press.Core.Domain;
 using Press.Core.Features.Sources.Scrape;
 using Press.Core.Infrastructure.Data;
+using Press.Core.Infrastructure.Scrapers;
 
 namespace Press.Core.Tests.Features.Sources;
 

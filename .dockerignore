@@ -5,6 +5,7 @@
 !*.sln
 !/src/**
 !/test/**
+!/perf/**
 !Directory.Build.props
 
 

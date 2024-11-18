@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using Press.Core.Domain;
 using Press.Core.Infrastructure.Data;
+using Press.Core.Infrastructure.Scrapers;
 
 namespace Press.Core.Features.Sources.Scrape;
 
