@@ -5,7 +5,7 @@ using System.CommandLine.Parsing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Press.Core;
-using Press.Core.Features.Publications.GetLatestBySource;
+using Press.Core.Features.Publications.Latest;
 using Press.Core.Features.Publications.Search;
 using Press.Core.Features.Sources.Scrape;
 using Press.Hosts.Cli.Extensions;

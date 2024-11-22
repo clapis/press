@@ -1,6 +1,6 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Press.Core.Features.Publications.GetLatestBySource;
+using Press.Core.Features.Publications.Latest;
 using Press.Core.Features.Publications.Search;
 
 namespace Press.Hosts.WebAPI.Endpoints;

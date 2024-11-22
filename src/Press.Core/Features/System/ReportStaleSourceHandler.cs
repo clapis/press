@@ -3,19 +3,19 @@ using Press.Core.Infrastructure;
 using Press.Core.Infrastructure.Cache;
 using Press.Core.Infrastructure.Data;
 
-namespace Press.Core.Features.System.MonitorStaleSource;
+namespace Press.Core.Features.System;
 
-public record MonitorStaleSource : IRequest;
+public record ReportStaleSources : IRequest;
 
-public class MonitorStaleSourceHandler(
+public class ReportStaleSourcesHandler(
     ICachedSourceStore sourceStore,
     IPublicationStore publicationStore, 
     INotificationService notificationService) 
-    : IRequestHandler<MonitorStaleSource>
+    : IRequestHandler<ReportStaleSources>
 {
     private static readonly TimeSpan MaxPublicationAge = TimeSpan.FromDays(3);
     
-    public async Task Handle(MonitorStaleSource delayRequest, CancellationToken cancellationToken)
+    public async Task Handle(ReportStaleSources delayRequest, CancellationToken cancellationToken)
     {
         var sources = await sourceStore.GetSourceMapAsync(cancellationToken);
         var latest = await publicationStore.GetLatestBySourceAsync(cancellationToken);
@@ -26,6 +26,6 @@ public class MonitorStaleSourceHandler(
 
         if (!stale.Any()) return;
 
-        await notificationService.NotifyStaleSourcesAsync(stale, cancellationToken);
+        await notificationService.ReportStaleSourcesAsync(stale, cancellationToken);
     }
 }

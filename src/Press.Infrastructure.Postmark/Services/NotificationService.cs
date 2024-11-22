@@ -36,31 +36,7 @@ public class NotificationService : INotificationService
         await NotifyAsync(user.Email, subject, body.ToString(), cancellationToken);
     }
 
-    public async Task SendReportAsync(User user, Dictionary<Alert, List<Publication>> report, CancellationToken cancellationToken)
-    {
-        var subject = "Resumo semanal";
-
-        var body = new StringBuilder();
-
-        body.AppendLine("Últimos resultados encontrados para os termos:");
-        body.AppendLine();
-
-        foreach (var (alert, publications) in report)
-        {
-            body.AppendLine($"## {alert.Term}");
-            body.AppendLine();
-            publications.ForEach(pub => body.AppendLine($"{pub.Date:dd/MM/yyyy}: {pub.Url}"));
-            body.AppendLine();
-            body.AppendLine();
-        }
-        
-        body.AppendLine();
-        body.AppendLine("Até mais, :)");
-
-        await NotifyAsync(user.Email, subject, body.ToString(), cancellationToken);
-    }
-
-    public async Task NotifyStaleSourcesAsync(Dictionary<Source, DateTime> stale, CancellationToken cancellationToken)
+    public async Task ReportStaleSourcesAsync(Dictionary<Source, DateTime> stale, CancellationToken cancellationToken)
     {
         var subject = "System: Stale Sources";
 
@@ -70,6 +46,26 @@ public class NotificationService : INotificationService
         {
             body.AppendLine($"{source.Name}: {last:dd/MM/yyyy}");
             body.AppendLine(source.Url);
+            body.AppendLine();
+        }
+        body.AppendLine();
+        body.AppendLine("Ciao, :)");
+
+        await NotifyAsync(_settings.Sender, subject, body.ToString(), cancellationToken);
+    }
+
+    public async Task ReportSourcesStatusAsync(Dictionary<Source, Publication> summary, CancellationToken cancellationToken)
+    {
+        var subject = "System: Source Status";
+
+        var body = new StringBuilder();
+
+        foreach (var (source, last) in summary)
+        {
+            body.AppendLine($"{source.Name}");
+            body.AppendLine($"IsEnabled: {source.IsEnabled}");
+            body.AppendLine($"Last Publication: {last.Date:dd/MM/yyyy} ({(DateTime.Now - last.Date).TotalDays} days ago)");
+            body.AppendLine($"Url: {source.Url}");
             body.AppendLine();
         }
         body.AppendLine();

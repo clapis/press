@@ -2,16 +2,18 @@ using MediatR;
 using Press.Core.Infrastructure;
 using Press.Core.Infrastructure.Data;
 
-namespace Press.Core.Features.Notifications.Alert;
+namespace Press.Core.Features.Alerts.Run;
 
-public class AlertHandler(
+public record RunAlerts : IRequest;
+
+public class RunAlertsHandler(
     IUserStore userStore,
     IAlertStore alertStore,
     IPublicationStore publicationStore,
     INotificationService notificationService)
-    : IRequestHandler<AlertRequest>
+    : IRequestHandler<RunAlerts>
 {
-    public async Task Handle(AlertRequest request, CancellationToken cancellationToken)
+    public async Task Handle(RunAlerts request, CancellationToken cancellationToken)
     {
         var users = await userStore.GetAllAsync(cancellationToken);
 

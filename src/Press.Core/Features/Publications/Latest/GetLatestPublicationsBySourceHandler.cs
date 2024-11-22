@@ -3,7 +3,7 @@ using Press.Core.Domain;
 using Press.Core.Infrastructure.Cache;
 using Press.Core.Infrastructure.Data;
 
-namespace Press.Core.Features.Publications.GetLatestBySource;
+namespace Press.Core.Features.Publications.Latest;
 
 public record GetLatestPublicationsBySourceRequest : IRequest<IReadOnlyCollection<GetLatestPublicationsBySourceResponseItem>>;
 public record GetLatestPublicationsBySourceResponseItem(string Id, string Url, string Source, DateTime Date);

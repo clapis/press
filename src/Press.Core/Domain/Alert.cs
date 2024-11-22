@@ -6,6 +6,5 @@ public class Alert
     public string Term { get; set; }
     public string UserId { get; set; }
     public DateTime? LastNotification { get; set; }
-
     public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
 }
