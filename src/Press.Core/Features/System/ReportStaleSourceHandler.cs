@@ -21,7 +21,8 @@ public class ReportStaleSourcesHandler(
         var latest = await publicationStore.GetLatestBySourceAsync(cancellationToken);
 
         var stale = latest
-            .Where(x => DateTime.UtcNow - x.CreatedOn > MaxPublicationAge)
+            .Where(pub => sources[pub.SourceId].IsOfficial)
+            .Where(pub => DateTime.UtcNow - pub.CreatedOn > MaxPublicationAge)
             .ToDictionary(pub => sources[pub.SourceId], pub => pub.Date);
 
         if (!stale.Any()) return;

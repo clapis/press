@@ -10,10 +10,10 @@ public class RegisterSources(IMongoCollection<Source> collection) : IHostedServi
     {
         var sources = new Source[]
         {
-            new() { Id = "dom_sp_franca", Name = "Franca - SP", Url = "https://www.franca.sp.gov.br/pmf-diario/", IsEnabled = true },
-            new() { Id = "dom_sp_sorocaba", Name = "Sorocaba - SP", Url = "https://noticias.sorocaba.sp.gov.br/jornal/", IsEnabled = true },
-            new() { Id = "dom_sp_sao_carlos", Name = "São Carlos - SP", Url = "http://www.saocarlos.sp.gov.br/index.php/diario-oficial.html", IsEnabled = true },
-            new() { Id = "x_do_concursos", Name = "D.O. Concursos", Url = "https://www.diariooficial.com.br/concursos-lista", IsEnabled = true }
+            new() { Id = "dom_sp_franca", Name = "Franca - SP", Url = "https://www.franca.sp.gov.br/pmf-diario/", IsOfficial = true, IsEnabled = true},
+            new() { Id = "dom_sp_sorocaba", Name = "Sorocaba - SP", Url = "https://noticias.sorocaba.sp.gov.br/jornal/", IsOfficial = true, IsEnabled = true },
+            new() { Id = "dom_sp_sao_carlos", Name = "São Carlos - SP", Url = "http://www.saocarlos.sp.gov.br/index.php/diario-oficial.html", IsOfficial = true, IsEnabled = true },
+            new() { Id = "x_do_concursos", Name = "D.O. Concursos", Url = "https://www.diariooficial.com.br/concursos-lista", IsOfficial = false, IsEnabled = true }
         };
 
         var updates = sources.Select(source => new ReplaceOneModel<Source>(

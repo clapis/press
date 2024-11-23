@@ -64,7 +64,7 @@ public class NotificationService : INotificationService
         {
             body.AppendLine($"{source.Name}");
             body.AppendLine($"IsEnabled: {source.IsEnabled}");
-            body.AppendLine($"Last Publication: {last.Date:dd/MM/yyyy} ({(DateTime.Now - last.Date).TotalDays} days ago)");
+            body.AppendLine($"Last Publication: {last.Date:dd/MM/yyyy} ({(DateTime.Now - last.Date).Days} days ago)");
             body.AppendLine($"Url: {source.Url}");
             body.AppendLine();
         }

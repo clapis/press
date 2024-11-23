@@ -23,7 +23,7 @@ public class ScrapingServiceTests
     [Fact(DisplayName = "When a document has already been scraped, skip it")]
     public async Task Test01()
     {
-        var source = new Source { Id = "test-01" };
+        var source = Mock.Of<Source>();
         
         // Document 1 has already been scrapped
         _store
