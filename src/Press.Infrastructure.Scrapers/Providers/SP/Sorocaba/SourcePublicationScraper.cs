@@ -1,44 +1,46 @@
+using System.Runtime.CompilerServices;
 using AngleSharp;
 using AngleSharp.Html.Dom;
-using Microsoft.Extensions.Logging;
 using Polly.Registry;
 using Press.Core.Domain;
 using Press.Core.Infrastructure.Scrapers;
 
-namespace Press.Infrastructure.Scrapers.Providers.Sorocaba;
+namespace Press.Infrastructure.Scrapers.Providers.SP.Sorocaba;
 
-public class SourcePublicationProvider(
+public class PublicationScraper(
     HttpClient httpClient,
-    ResiliencePipelineProvider<string> polly,
-    ILogger<SourcePublicationProvider> logger) 
-    : ISourcePublicationProvider
+    IPdfContentExtractor extractor,
+    ResiliencePipelineProvider<string> polly) 
+    : IPublicationScraper
 {
     public string SourceId => "dom_sp_sorocaba";
 
-    public async Task<List<Publication>> ProvideAsync(CancellationToken cancellationToken)
+    public async IAsyncEnumerable<Publication> ScrapeAsync(List<string> existing, 
+        [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        var publications = new List<Publication>();
-        
         foreach (var page in Pages())
         {
             var links = await ScrapePageLinksAsync(page, cancellationToken);
 
-            publications.AddRange(links
-                .Select(link => new Publication
+            foreach (var link in links.Except(existing))
+            {
+                var contents = await extractor.ExtractAsync(link, cancellationToken);
+
+                yield return new Publication
                 {
                     Url = link,
                     SourceId = SourceId,
+                    Contents = contents,
                     Date = DateTime.UtcNow.Date
-                }));
+                };
+            }
         }
-
-        return publications;
     }
 
     private static IEnumerable<string> Pages()
     {
-        yield return "https://noticias.sorocaba.sp.gov.br/jornal/";
         yield return "https://noticias.sorocaba.sp.gov.br/jornal/page/2/";
+        yield return "https://noticias.sorocaba.sp.gov.br/jornal/";
     }
 
     private async Task<List<string>> ScrapePageLinksAsync(string url, CancellationToken cancellationToken)
@@ -59,7 +61,7 @@ public class SourcePublicationProvider(
         var links = document
             .QuerySelectorAll("#jornal-home a")
             .OfType<IHtmlAnchorElement>()
-            .Select(x => x.Href)
+            .Select(x => x.Href.Replace("http://", "https://"))
             .Where(x => x.EndsWith(".pdf"))
             .Distinct()
             .ToList();

@@ -10,11 +10,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services
     .AddCore()
-    .AddScrapers()
     .AddQuartzJobs()
     .AddMongoDb(GetSettings<MongoDbSettings>("MongoDb"))
     .AddPostmark(GetSettings<PostmarkSettings>("Postmark"))
-    .AddTelemetry(GetSettings<TelemetryOptions>("Telemetry"));
+    .AddTelemetry(GetSettings<TelemetryOptions>("Telemetry"))
+    .AddScrapers(GetSettings<ScrapersSettings>("Scrapers"));
 
 builder.Services
     .AddAuthorization()

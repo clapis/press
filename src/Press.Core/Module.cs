@@ -1,6 +1,5 @@
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
-using Press.Core.Features.Sources.Scrape;
 using Press.Core.Infrastructure.Cache;
 
 namespace Press.Core;
@@ -14,10 +13,7 @@ public static class Module
         services.AddMediatR(x 
             => x.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
-        services
-            .AddTransient<ScrapingService>()
-            .AddTransient<ICachedSourceStore, CachedSourceStore>()
-            .AddTransient<IPublicationProvider, PublicationProvider>();
+        services.AddTransient<ICachedSourceStore, CachedSourceStore>();
 
         return services;
     }

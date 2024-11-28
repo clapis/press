@@ -21,9 +21,9 @@ await BuildCommandLine()
 
             services
                 .AddCore()
-                .AddScrapers()
                 .AddMongoDb(GetSettings<MongoDbSettings>("MongoDb"))
-                .AddPostmark(GetSettings<PostmarkSettings>("Postmark"));
+                .AddPostmark(GetSettings<PostmarkSettings>("Postmark"))
+                .AddScrapers(GetSettings<ScrapersSettings>("Scrapers"));
         }))
     .UseDefaults()
     .Build()

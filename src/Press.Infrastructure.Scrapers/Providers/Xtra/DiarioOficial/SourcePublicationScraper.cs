@@ -1,26 +1,34 @@
 using System.Net.Http.Json;
+using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 using Press.Core.Domain;
 using Press.Core.Infrastructure.Scrapers;
 
 namespace Press.Infrastructure.Scrapers.Providers.Xtra.DiarioOficial;
 
-public class SourcePublicationProvider(HttpClient client) 
-    : ISourcePublicationProvider
+public class PublicationScraper(
+    HttpClient client, 
+    IPdfContentExtractor extractor) : IPublicationScraper
 {
     public string SourceId => "x_do_concursos";
     
-    public async Task<List<Publication>> ProvideAsync(CancellationToken cancellationToken)
+    public async IAsyncEnumerable<Publication> ScrapeAsync(List<string> existing, 
+        [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         var links = await GetAnnouncementsLinksAsync(cancellationToken);
-        
-        return links.Select(link => new Publication
+
+        foreach (var link in links.Except(existing))
+        {
+            var contents = await extractor.ExtractAsync(link, cancellationToken);
+
+            yield return new Publication
             {
-                Url = link, 
-                SourceId = SourceId, 
+                Url = link,
+                SourceId = SourceId,
+                Contents = contents,
                 Date = DateTime.UtcNow.Date
-            })
-            .ToList();
+            };
+        }
     }
 
     private async Task<IEnumerable<string>> GetAnnouncementsLinksAsync(CancellationToken cancellationToken)

@@ -1,41 +1,43 @@
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using AngleSharp;
 using AngleSharp.Html.Dom;
-using Microsoft.Extensions.Logging;
 using Polly.Registry;
 using Press.Core.Domain;
 using Press.Core.Infrastructure.Scrapers;
 using Press.Infrastructure.Scrapers.Extensions;
 
-namespace Press.Infrastructure.Scrapers.Providers.SaoCarlos;
+namespace Press.Infrastructure.Scrapers.Providers.SP.SaoCarlos;
 
-public class SourcePublicationProvider(
+public class PublicationScraper(
     HttpClient httpClient,
-    ResiliencePipelineProvider<string> polly,
-    ILogger<SourcePublicationProvider> logger
-    ) : ISourcePublicationProvider
+    IPdfContentExtractor extractor,
+    ResiliencePipelineProvider<string> polly
+    ) : IPublicationScraper
 {
     public string SourceId => "dom_sp_sao_carlos";
-
-    public async Task<List<Publication>> ProvideAsync(CancellationToken cancellationToken)
+    
+    public async IAsyncEnumerable<Publication> ScrapeAsync(List<string> existing, 
+        [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        var publications = new List<Publication>();
-        
         foreach (var page in Pages())
         {
-            var links = await ScrapePageLinksAsync(Page(DateTime.Today), cancellationToken);
+            var links = await ScrapePageLinksAsync(page, cancellationToken);
 
-            publications.AddRange(links
-                .Select(link => new Publication
+            foreach (var link in links.Except(existing))
+            {
+                var contents = await extractor.ExtractAsync(link, cancellationToken);
+
+                yield return new Publication
                 {
                     Url = link,
                     SourceId = SourceId,
+                    Contents = contents,
                     Date = GetDateFrom(link)
-                }));
+                };
+            }
         }
-
-        return publications;
     }
 
     private static IEnumerable<string> Pages()

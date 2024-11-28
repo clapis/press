@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 using Press.Core.Domain;
 using Press.Core.Infrastructure.Data;
+using Press.Core.Infrastructure.Scrapers;
 
 namespace Press.Core.Features.Sources.Scrape;
 
@@ -12,15 +13,16 @@ public record ScrapeSourcesRequest : IRequest
 }
 
 public class ScrapeSourcesHandler(
-    ISourceStore store,
-    ScrapingService service,
+    ISourceStore sourceStore,
+    IPublicationStore publicationStore,
+    IEnumerable<IPublicationScraper> providers,
     ILogger<ScrapeSourcesHandler> logger)
     : IRequestHandler<ScrapeSourcesRequest>
 {
     
     public async Task Handle(ScrapeSourcesRequest request, CancellationToken cancellationToken)
     {
-        var sources = await store.GetAllAsync(cancellationToken);
+        var sources = await sourceStore.GetAllAsync(cancellationToken);
 
         if (request.Ids.Any())
             sources = sources.IntersectBy(request.Ids, x => x.Id).ToList();
@@ -42,7 +44,12 @@ public class ScrapeSourcesHandler(
                 return;
             }
 
-            await service.ScrapeAsync(source, cancellationToken);
+            var provider = GetPublicationScraper(source);
+            
+            var existing = await publicationStore.GetLatestUrlsAsync(source, cancellationToken);
+            
+            await foreach (var publication in provider.ScrapeAsync(existing, cancellationToken))
+                await publicationStore.SaveAsync(publication, cancellationToken);
             
             logger.LogInformation("Scraping: {Source} completed after {Duration} ms", source.Name, sw.ElapsedMilliseconds);
 
@@ -52,4 +59,18 @@ public class ScrapeSourcesHandler(
             logger.LogError(ex, "Scraping: {Source} failed after {Duration} ms", source.Name, sw.ElapsedMilliseconds);
         }
     }
+    
+    private IPublicationScraper GetPublicationScraper(Source source)
+    {
+        var results =  providers.Where(x => x.SourceId == source.Id).ToList();
+
+        if (results == null)
+            throw new Exception($"Failed to find the scraper for source '{source.Id}'");
+        
+        if (results.Count > 1)
+            throw new Exception($"There are multiple scrapers registered with source '{source.Id}'");
+
+        return results.Single();
+    }
+
 }

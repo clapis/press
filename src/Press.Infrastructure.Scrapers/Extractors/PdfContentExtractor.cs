@@ -1,9 +1,12 @@
 using System.Text;
+using Microsoft.Extensions.Logging;
 using Press.Core.Infrastructure.Scrapers;
 
 namespace Press.Infrastructure.Scrapers.Extractors;
 
-public class PdfContentExtractor(HttpClient client) : IPdfContentExtractor
+public class PdfContentExtractor(
+    HttpClient client,
+    ILogger<PdfContentExtractor> logger) : IPdfContentExtractor
 {
     public async Task<string> ExtractAsync(string url, CancellationToken cancellationToken)
     {
@@ -13,7 +16,12 @@ public class PdfContentExtractor(HttpClient client) : IPdfContentExtractor
 
         await DownloadFileAsync(url, filePath, cancellationToken);
 
-        return ExtractPdfText(filePath);
+        var contents = ExtractPdfContents(filePath);
+        
+        if (string.IsNullOrWhiteSpace(contents))
+            logger.LogWarning("Publication has no contents {Url}", url);
+        
+        return contents;
     }
 
     private async Task DownloadFileAsync(string url, string filePath, CancellationToken cancellationToken)
@@ -29,7 +37,7 @@ public class PdfContentExtractor(HttpClient client) : IPdfContentExtractor
         await stream.CopyToAsync(file, cancellationToken);
     }
 
-    private string ExtractPdfText(string filePath)
+    private string ExtractPdfContents(string filePath)
     {
         var result = new StringBuilder();
         

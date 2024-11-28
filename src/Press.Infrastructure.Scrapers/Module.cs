@@ -10,28 +10,33 @@ namespace Press.Infrastructure.Scrapers;
 
 public static class Module
 {
-    public static IServiceCollection AddScrapers(this IServiceCollection services)
+    public static IServiceCollection AddScrapers(this IServiceCollection services, ScrapersSettings settings)
     {
         services
-            .ConfigureHttpClientDefaults(builder => builder
-                .ConfigureHttpClient(client =>
-                {
-                    client.DefaultRequestHeaders.UserAgent.TryParseAdd(
-                        "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:15.0) Gecko/20100101 Firefox/15.0.1");
-                })
-                .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
-                {
-                    UseProxy = true,
-                    Proxy = new WebProxy("socks5://openvpn-dante-proxy.openvpn-dante-proxy:1080")
-                }));
-            
-        services
             .AddPollyPipelines()
-            .AddPublicationProviders();
+            .AddPublicationProviders()
+            .AddScrapersHttpClient(settings);
         
         services.AddTransient<IPdfContentExtractor, PdfContentExtractor>();
 
         return services;
+    }
+
+    private static IServiceCollection AddScrapersHttpClient(this IServiceCollection services, ScrapersSettings settings)
+    {
+        return services
+            .ConfigureHttpClientDefaults(builder => builder
+                .ConfigureHttpClient(client =>
+                {
+                    client.DefaultRequestHeaders.UserAgent.TryParseAdd(
+                        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36");
+                })
+                .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+                {
+                    UseProxy = settings.UseProxy,
+                    Proxy = settings.UseProxy ? new WebProxy(settings.ProxyAddress) : null,
+                    AllowAutoRedirect = false
+                }));
     }
 
     private static IServiceCollection AddPublicationProviders(this IServiceCollection services)
@@ -39,9 +44,9 @@ public static class Module
         Assembly.GetExecutingAssembly()
             .GetTypes()
             .Where(x => x is { IsClass: true, IsAbstract: false })
-            .Where(x => x.IsAssignableTo(typeof(ISourcePublicationProvider)))
+            .Where(x => x.IsAssignableTo(typeof(IPublicationScraper)))
             .ToList()
-            .ForEach(provider => services.AddTransient(typeof(ISourcePublicationProvider), provider));
+            .ForEach(provider => services.AddTransient(typeof(IPublicationScraper), provider));
 
         return services;
     }

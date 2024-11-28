@@ -1,32 +1,40 @@
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Press.Core.Domain;
 using Press.Core.Infrastructure.Scrapers;
 
-namespace Press.Infrastructure.Scrapers.Providers.Franca;
+namespace Press.Infrastructure.Scrapers.Providers.SP.Franca;
 
-public class SourcePublicationProvider(HttpClient httpClient) : ISourcePublicationProvider
+public class PublicationScraper(
+    HttpClient httpClient,
+    IPdfContentExtractor extractor) : IPublicationScraper
 {
     public string SourceId => "dom_sp_franca";
-
-    public async Task<List<Publication>> ProvideAsync(CancellationToken cancellationToken)
+    
+    public async IAsyncEnumerable<Publication> ScrapeAsync(List<string> existing, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        var publications = new List<Publication>();
-        
-        foreach (var date in Last7Days())
+        var dates = Enumerable.Range(0, 7)
+            .Select(x => DateTime.UtcNow.Date.AddDays(-x))
+            .Reverse();
+
+        foreach (var date in dates)
         {
             var links = await GetPublicationsByDateAsync(date, cancellationToken);
 
-            publications.AddRange(links
-                .Select(link => new Publication
+            foreach (var link in links.Except(existing))
+            {
+                var contents = await extractor.ExtractAsync(link, cancellationToken);
+                
+                yield return new Publication
                 {
                     Url = link,
                     SourceId = SourceId,
-                    Date = DateTime.UtcNow.Date
-                }));
+                    Contents = contents,
+                    Date = date
+                };
+            }
         }
-
-        return publications;
     }
 
     private async Task<IEnumerable<string>> GetPublicationsByDateAsync(DateTime date, CancellationToken cancellationToken)
@@ -42,9 +50,6 @@ public class SourcePublicationProvider(HttpClient httpClient) : ISourcePublicati
         return JsonSerializer.Deserialize<List<Entry>>(content)!
             .Select(x => BuildPublicationLink(x.Filename));
     }
-
-    private static IEnumerable<DateTime> Last7Days() 
-        => Enumerable.Range(0, 7).Select(x => DateTime.Today.AddDays(-x));
 
     private static string BuildPublicationsPageUrl(DateTime date) 
         => $"https://www.franca.sp.gov.br/pmf-diario/rest/diario/buscaPorArquivo/{date:dd-MM-yyyy}";
