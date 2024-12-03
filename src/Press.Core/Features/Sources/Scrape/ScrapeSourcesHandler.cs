@@ -36,6 +36,8 @@ public class ScrapeSourcesHandler(
     {
         var sw = Stopwatch.StartNew();
 
+        var publications = 0;
+
         try
         {
             if (!source.IsEnabled)
@@ -49,14 +51,17 @@ public class ScrapeSourcesHandler(
             var existing = await publicationStore.GetLatestUrlsAsync(source, cancellationToken);
             
             await foreach (var publication in provider.ScrapeAsync(existing, cancellationToken))
+            {
                 await publicationStore.SaveAsync(publication, cancellationToken);
-            
-            logger.LogInformation("Scraping: {Source} completed after {Duration} ms", source.Name, sw.ElapsedMilliseconds);
+                publications++;
+            }
+
+            logger.LogInformation("Scraping: {Source} completed. ({Publications} docs, {Duration} ms)", source.Name, publications, sw.ElapsedMilliseconds);
 
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Scraping: {Source} failed after {Duration} ms", source.Name, sw.ElapsedMilliseconds);
+            logger.LogError(ex, "Scraping: {Source} failed. ({Publications} docs, {Duration} ms)", source.Name, publications, sw.ElapsedMilliseconds);
         }
     }
     
