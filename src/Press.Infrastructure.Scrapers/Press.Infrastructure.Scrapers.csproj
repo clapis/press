@@ -13,8 +13,4 @@
         <ProjectReference Include="..\Press.Core\Press.Core.csproj"/>
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Providers\SP\" />
-    </ItemGroup>
-
 </Project>

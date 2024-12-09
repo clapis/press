@@ -52,7 +52,11 @@ public class ScrapeSourcesHandler(
             
             await foreach (var publication in provider.ScrapeAsync(existing, cancellationToken))
             {
+                if (string.IsNullOrWhiteSpace(publication.Contents))
+                    logger.LogWarning("Publication has no contents (Source: {Source}, Url: {Url})", source.Name, publication.Url);
+                
                 await publicationStore.SaveAsync(publication, cancellationToken);
+                
                 publications++;
             }
 

@@ -1,13 +1,12 @@
 using System.Text;
-using Microsoft.Extensions.Logging;
 using Press.Core.Infrastructure.Scrapers;
 
 namespace Press.Infrastructure.Scrapers.Extractors;
 
-public class PdfContentExtractor(
-    HttpClient client,
-    ILogger<PdfContentExtractor> logger) : IPdfContentExtractor
+public class PdfContentExtractor(HttpClient client) : IPdfContentExtractor
 {
+    private static readonly string[] PdfContentTypes = new[] { "application/pdf", "application/octet-stream" };
+    
     public async Task<string> ExtractAsync(string url, CancellationToken cancellationToken)
     {
         using var directory = new DisposableDirectory();
@@ -16,12 +15,7 @@ public class PdfContentExtractor(
 
         await DownloadFileAsync(url, filePath, cancellationToken);
 
-        var contents = ExtractPdfContents(filePath);
-        
-        if (string.IsNullOrWhiteSpace(contents))
-            logger.LogWarning("Publication has no contents {Url}", url);
-        
-        return contents;
+        return await ExtractPdfContentsAsync(filePath, cancellationToken);
     }
 
     private async Task DownloadFileAsync(string url, string filePath, CancellationToken cancellationToken)
@@ -29,6 +23,8 @@ public class PdfContentExtractor(
         using var response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
         
         response.EnsureSuccessStatusCode();
+        
+        EnsureContentTypeIsPdf(response);
 
         await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
 
@@ -37,7 +33,7 @@ public class PdfContentExtractor(
         await stream.CopyToAsync(file, cancellationToken);
     }
 
-    private string ExtractPdfContents(string filePath)
+    private Task<string> ExtractPdfContentsAsync(string filePath, CancellationToken cancellationToken)
     {
         var result = new StringBuilder();
         
@@ -49,6 +45,14 @@ public class PdfContentExtractor(
                 result.Append(pageReader.GetText());
         }
         
-        return result.ToString();
+        return Task.FromResult(result.ToString());
+    }
+
+    private void EnsureContentTypeIsPdf(HttpResponseMessage response)
+    {
+        var contentType = response.Content.Headers.ContentType?.MediaType;
+        
+        if (!PdfContentTypes.Contains(contentType))
+            throw new Exception($"Application type '{contentType}' is not expected ({response.RequestMessage?.RequestUri})");
     }
 }

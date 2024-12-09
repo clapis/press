@@ -15,7 +15,7 @@ public class Federal(
     public async IAsyncEnumerable<Publication> ScrapeAsync(List<string> existing,
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        var dates = Enumerable.Range(0, 2)
+        var dates = Enumerable.Range(0, 5)
             .Select(x => DateTime.UtcNow.Date.AddDays(-x))
             .Reverse();
 

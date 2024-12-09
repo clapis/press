@@ -16,11 +16,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Assets\" />
-      <Folder Include="obj\" />
-    </ItemGroup>
-
-    <ItemGroup>
       <None Remove="Assets\doe_sp.pdf" />
       <Content Include="Assets\doe_sp.pdf">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

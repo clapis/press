@@ -14,15 +14,17 @@ public static class Module
     {
         services
             .AddPollyPipelines()
-            .AddPublicationProviders()
-            .AddScrapersHttpClient(settings);
+            .AddPublicationProviders();
+            
+        services
+            .ConfigureHttpClient(settings);
         
         services.AddTransient<IPdfContentExtractor, PdfContentExtractor>();
 
         return services;
     }
 
-    private static IServiceCollection AddScrapersHttpClient(this IServiceCollection services, ScrapersSettings settings)
+    private static IServiceCollection ConfigureHttpClient(this IServiceCollection services, ScrapersSettings settings)
     {
         return services
             .ConfigureHttpClientDefaults(builder => builder
@@ -34,9 +36,9 @@ public static class Module
                 .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
                 {
                     UseProxy = settings.UseProxy,
-                    Proxy = settings.UseProxy ? new WebProxy(settings.ProxyAddress) : null,
-                    AllowAutoRedirect = false
-                }));
+                    Proxy = settings.UseProxy ? new WebProxy(settings.ProxyAddress) : null
+                })
+                .SetHandlerLifetime(TimeSpan.FromMinutes(10)));
     }
 
     private static IServiceCollection AddPublicationProviders(this IServiceCollection services)
