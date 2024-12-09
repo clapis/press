@@ -15,7 +15,7 @@ public class PdfContentExtractor(HttpClient client) : IPdfContentExtractor
 
         await DownloadFileAsync(url, filePath, cancellationToken);
 
-        return await ExtractPdfContentsAsync(filePath, cancellationToken);
+        return await ExtractTextAsync(filePath, cancellationToken);
     }
 
     private async Task DownloadFileAsync(string url, string filePath, CancellationToken cancellationToken)
@@ -33,11 +33,11 @@ public class PdfContentExtractor(HttpClient client) : IPdfContentExtractor
         await stream.CopyToAsync(file, cancellationToken);
     }
 
-    private Task<string> ExtractPdfContentsAsync(string filePath, CancellationToken cancellationToken)
+    public Task<string> ExtractTextAsync(string filepath, CancellationToken cancellationToken)
     {
         var result = new StringBuilder();
         
-        using var docReader = Docnet.Core.DocLib.Instance.GetDocReader(filePath, new Docnet.Core.Models.PageDimensions());
+        using var docReader = Docnet.Core.DocLib.Instance.GetDocReader(filepath, new Docnet.Core.Models.PageDimensions());
         
         for (var i = 0; i < docReader.GetPageCount(); i++)
         {
