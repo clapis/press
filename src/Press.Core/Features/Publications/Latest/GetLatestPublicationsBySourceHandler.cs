@@ -6,7 +6,7 @@ using Press.Core.Infrastructure.Data;
 namespace Press.Core.Features.Publications.Latest;
 
 public record GetLatestPublicationsBySourceRequest : IRequest<IReadOnlyCollection<GetLatestPublicationsBySourceResponseItem>>;
-public record GetLatestPublicationsBySourceResponseItem(string Id, string Url, string Source, DateTime Date);
+public record GetLatestPublicationsBySourceResponseItem(string Id, string Url, string Source, DateTime Date, bool IsOfficial);
 
 public class GetLatestPublicationsBySourceHandler(IPublicationStore publications, ICachedSourceStore cache) 
     : IRequestHandler<GetLatestPublicationsBySourceRequest, IReadOnlyCollection<GetLatestPublicationsBySourceResponseItem>>
@@ -20,5 +20,5 @@ public class GetLatestPublicationsBySourceHandler(IPublicationStore publications
     }
 
     private GetLatestPublicationsBySourceResponseItem Map(Publication publication, Source source)
-        => new(publication.Id, publication.Url, source.Name, publication.Date);
+        => new(publication.Id, publication.Url, source.Name, publication.Date, source.IsOfficial);
 }
