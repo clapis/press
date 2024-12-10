@@ -3,11 +3,12 @@ using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 using Press.Core.Domain;
 using Press.Core.Infrastructure.Scrapers;
+using Press.Infrastructure.Scrapers.Extensions;
 
 namespace Press.Infrastructure.Scrapers.Providers.Xtra.DiarioOficial;
 
 public class PublicationScraper(
-    HttpClient client, 
+    HttpClient httpClient, 
     IPdfContentExtractor extractor) : IPublicationScraper
 {
     public string SourceId => "x_do_concursos";
@@ -19,7 +20,9 @@ public class PublicationScraper(
 
         foreach (var link in links.Except(existing))
         {
-            var contents = await extractor.ExtractAsync(link, cancellationToken);
+            using var file = await httpClient.DownloadAsync(link, cancellationToken);
+                
+            var contents = await extractor.ExtractTextAsync(file.Path, cancellationToken);
 
             yield return new Publication
             {
@@ -45,7 +48,7 @@ public class PublicationScraper(
     {
         var url = $"https://apidiario.wfonline.com.br/api/concursos?page={page}";
 
-        var data = await client.GetFromJsonAsync<Data>(url, cancellationToken: cancellationToken);
+        var data = await httpClient.GetFromJsonAsync<Data>(url, cancellationToken: cancellationToken);
                      
         if (data == null) throw new Exception("Content expected");
 

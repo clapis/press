@@ -27,7 +27,9 @@ public class PublicationScraper(
 
             foreach (var link in links.Except(existing))
             {
-                var contents = await extractor.ExtractAsync(link, cancellationToken);
+                using var file = await httpClient.DownloadAsync(link, cancellationToken);
+                
+                var contents = await extractor.ExtractTextAsync(file.Path, cancellationToken);
 
                 yield return new Publication
                 {
