@@ -16,7 +16,7 @@ internal class Indexes(
 
         await publications.Indexes.CreateOneAsync(new CreateIndexModel<Publication>(
             Builders<Publication>.IndexKeys.Descending(x => x.Date),
-            new CreateIndexOptions { Background = true }), cancellationToken: cancellationToken);
+            new CreateIndexOptions { Background = true, ExpireAfter = TimeSpan.FromDays(90)}), cancellationToken: cancellationToken);
 
         await publications.Indexes.CreateOneAsync(new CreateIndexModel<Publication>(
             Builders<Publication>.IndexKeys
