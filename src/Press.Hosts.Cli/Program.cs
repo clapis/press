@@ -5,8 +5,8 @@ using System.CommandLine.Parsing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Press.Core;
-using Press.Core.Features.Publications.Latest;
 using Press.Core.Features.Publications.Search;
+using Press.Core.Features.Sources.Get;
 using Press.Core.Features.Sources.Scrape;
 using Press.Hosts.Cli.Extensions;
 using Press.Infrastructure.MongoDb;
@@ -34,8 +34,8 @@ await BuildCommandLine()
 // press-cli sources disable [source]
 // press-cli sources scrape --all
 // press-cli sources scrape [source]
+// press-cli sources status
 
-// press-cli publications latest
 // press-cli publications search --query [term]
 
 static CommandLineBuilder BuildCommandLine()
@@ -45,9 +45,9 @@ static CommandLineBuilder BuildCommandLine()
     root
         .AddSubcommand("sources", opts => opts
             .AddSubcommand<ScrapeSourcesRequest>("scrape", "Scrapes sources for new publications"))
+            .AddSubcommand<GetSourcesRequest>("status", "Returns latest publications by source")
         .AddSubcommand("publications", opts => opts
-            .AddSubcommand<SearchPublicationsRequest>("search", "Search scraped publications for a given term")
-            .AddSubcommand<GetLatestPublicationsBySourceRequest>("latest", "Returns latest publications by source"));
+            .AddSubcommand<SearchPublicationsRequest>("search", "Search scraped publications for a given term"));
 
     return new CommandLineBuilder(root);
 }

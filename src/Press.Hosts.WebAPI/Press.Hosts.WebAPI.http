@@ -1,6 +1,6 @@
 @Press.Hosts.WebAPI_HostAddress = http://localhost:5138
 
-GET {{Press.Hosts.WebAPI_HostAddress}}/publications/latest-by-source/
+GET {{Press.Hosts.WebAPI_HostAddress}}/source/status
 Accept: application/json
 
 ###
