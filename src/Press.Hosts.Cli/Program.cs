@@ -36,7 +36,7 @@ await BuildCommandLine()
 // press-cli sources scrape [source]
 // press-cli sources status
 
-// press-cli publications search --query [term]
+// press-cli publications search --query [keyword]
 
 static CommandLineBuilder BuildCommandLine()
 {
@@ -47,7 +47,7 @@ static CommandLineBuilder BuildCommandLine()
             .AddSubcommand<ScrapeSourcesRequest>("scrape", "Scrapes sources for new publications"))
             .AddSubcommand<GetSourcesRequest>("status", "Returns latest publications by source")
         .AddSubcommand("publications", opts => opts
-            .AddSubcommand<SearchPublicationsRequest>("search", "Search scraped publications for a given term"));
+            .AddSubcommand<SearchPublicationsRequest>("search", "Search scraped publications for a given keyword"));
 
     return new CommandLineBuilder(root);
 }

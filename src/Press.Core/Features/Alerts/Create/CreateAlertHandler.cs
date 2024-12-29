@@ -16,13 +16,14 @@ public class CreateAlertHandler(IAlertStore store) : IRequestHandler<CreateAlert
             throw new Exception("User {UserId} has exceeded max number of alerts.");
         
         // If there is already an alert for this keyword, ignore request
-        if (alerts.Any(x => x.Term == request.Keyword)) 
+        if (alerts.Any(x => x.Keyword == request.Keyword && x.SourceId == request.SourceId)) 
             return;
         
         var alert = new Alert
         {
-            Term = request.Keyword, 
-            UserId = request.UserId
+            UserId = request.UserId,
+            Keyword = request.Keyword, 
+            SourceId = request.SourceId
         };
 
         await store.InsertAsync(alert, cancellationToken);

@@ -23,8 +23,8 @@ public class RunAlertsHandler(
 
             foreach (var alert in alerts)
             {
-                var pubs = await publicationStore.SearchAsync(alert.Term, cancellationToken);
-
+                var pubs = await publicationStore.SearchAsync(alert.Keyword, cancellationToken);
+                
                 var last = alert.LastNotification ?? DateTime.MinValue;
 
                 var notifications = pubs.Where(p => p.CreatedOn > last).ToList();

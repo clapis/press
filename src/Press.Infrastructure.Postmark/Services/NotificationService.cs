@@ -24,10 +24,10 @@ public class NotificationService : INotificationService
 
     public async Task SendAlertAsync(User user, Alert alert, List<Publication> publications, CancellationToken cancellationToken)
     {
-        var subject = $"{alert.Term}";
+        var subject = $"{alert.Keyword}";
 
         var body = new StringBuilder();
-        body.AppendLine($"Termo '{alert.Term}' encontrado em:");
+        body.AppendLine($"Termo '{alert.Keyword}' encontrado em:");
         body.AppendLine();
         publications.ForEach(pub => body.AppendLine($"{pub.Date:dd/MM/yyyy}: {pub.Url}"));
         body.AppendLine();
