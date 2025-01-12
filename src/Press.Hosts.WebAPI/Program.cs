@@ -45,9 +45,10 @@ app.UseOutputCache();
 
 app.MapHealthChecks("/healthz");
 
-app.MapAlertEndpoints()
+app.MapSystemEndpoints()
+    .MapAlertEndpoints()
     .MapSourceEndpoints()
-    .MapSystemEndpoints()
+    .MapProfileEndpoints()
     .MapWebhookEndpoints()
     .MapPublicationEndpoints();
 
