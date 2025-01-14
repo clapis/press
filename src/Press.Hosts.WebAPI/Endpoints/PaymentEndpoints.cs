@@ -17,23 +17,23 @@ public static class PaymentEndpoints
         group.MapPost("/pricing",
             async (ClaimsPrincipal principal,
                 [FromServices] IUserStore store,
-                [FromServices] ISubscriptionService service,
+                [FromServices] IStripeService service,
                 CancellationToken cancellationToken) =>
             {
                 var user = await store.GetByIdAsync(principal.GetUserId(), cancellationToken);
 
-                return await service.CreatePricingSessionSecretAsync(user!.CustomerId, cancellationToken);
+                return await service.CreatePricingSessionSecretAsync(user.CustomerId, cancellationToken);
             });
 
         group.MapPost("/portal",
             async (ClaimsPrincipal principal,
                 [FromServices] IUserStore store,
-                [FromServices] ISubscriptionService service,
+                [FromServices] IStripeService service,
                 CancellationToken cancellationToken) =>
             {
                 var user = await store.GetByIdAsync(principal.GetUserId(), cancellationToken);
 
-                return await service.CreateBillingPortalSessionAsync(user!.CustomerId, cancellationToken);
+                return await service.CreateBillingPortalSessionAsync(user.CustomerId, cancellationToken);
             });
 
         return app;

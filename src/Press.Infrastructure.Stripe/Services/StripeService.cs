@@ -5,11 +5,11 @@ using Subscription = Press.Core.Domain.Subscription;
 
 namespace Press.Infrastructure.Stripe.Services;
 
-public class SubscriptionService(
+public class StripeService(
     SessionService sessionService,
     ProductService productService,
     CustomerService customerService,
-    CustomerSessionService customerSessionService) : ISubscriptionService
+    CustomerSessionService customerSessionService) : IStripeService
 {
     private const string DefaultLocale = "pt-BR";
     
@@ -50,7 +50,8 @@ public class SubscriptionService(
                     return new Subscription
                     {
                         Name = product.Name,
-                        MaxAlerts = int.Parse(max)
+                        MaxAlerts = int.Parse(max),
+                        IsTrial = false
                     };
                 }
             }

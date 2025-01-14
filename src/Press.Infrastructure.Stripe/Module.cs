@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Press.Core.Infrastructure.Subscriptions;
+using Press.Infrastructure.Stripe.Services;
 using Stripe;
 using Stripe.BillingPortal;
 
@@ -20,7 +21,7 @@ public static class Module
             .AddTransient<SessionService>()
             .AddTransient<CustomerSessionService>();
 
-        services.AddTransient<ISubscriptionService, Services.SubscriptionService>();
+        services.AddTransient<IStripeService, StripeService>();
         
         return services;
     }

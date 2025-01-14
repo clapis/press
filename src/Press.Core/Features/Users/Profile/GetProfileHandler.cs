@@ -9,5 +9,5 @@ public record GetProfile(string UserId) : IRequest<User>;
 public class GetProfileHandler(IUserStore store) : IRequestHandler<GetProfile, User>
 {
     public async Task<User> Handle(GetProfile request, CancellationToken cancellationToken) 
-        => (await store.GetByIdAsync(request.UserId, cancellationToken))!;
+        => await store.GetByIdAsync(request.UserId, cancellationToken);
 }

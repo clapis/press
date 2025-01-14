@@ -2,7 +2,7 @@ using Press.Core.Domain;
 
 namespace Press.Core.Infrastructure.Subscriptions;
 
-public interface ISubscriptionService
+public interface IStripeService
 {
     Task<string> RegisterCustomerAsync(string email, CancellationToken cancellationToken);
     Task<Subscription?> GetSubscriptionAsync(string customerId, CancellationToken cancellationToken);

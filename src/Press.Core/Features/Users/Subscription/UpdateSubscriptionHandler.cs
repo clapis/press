@@ -8,7 +8,7 @@ public record UpdateSubscription(string CustomerId) : IRequest;
 
 public class UpdateSubscriptionHandler(
     IUserStore store,
-    ISubscriptionService service) 
+    IStripeService service) 
     : IRequestHandler<UpdateSubscription>
 {
     public async Task Handle(UpdateSubscription request, CancellationToken cancellationToken)

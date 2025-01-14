@@ -9,17 +9,17 @@ public record CreateUser(string Id, string Email) : IRequest;
 
 public class CreateUserHandler(
     IUserStore store,
-    ISubscriptionService service) : IRequestHandler<CreateUser>
+    IStripeService service) : IRequestHandler<CreateUser>
 {
     public async Task Handle(CreateUser request, CancellationToken cancellationToken)
     {
-        var id = await service.RegisterCustomerAsync(request.Email, cancellationToken);
+        var customerId = await service.RegisterCustomerAsync(request.Email, cancellationToken);
 
         var user = new User
         {
             Id = request.Id, 
             Email = request.Email, 
-            CustomerId = id, 
+            CustomerId = customerId,
             Subscription = new ()
             {
                 Name = "Explore Grátis",

@@ -4,20 +4,16 @@ using Press.Core.Infrastructure.Data;
 
 namespace Press.Core.Features.Alerts.Create;
 
-public class CreateAlertHandler(IAlertStore store) : IRequestHandler<CreateAlertRequest>
+public class CreateAlertHandler(IUserStore userStore, IAlertStore alertStore) : IRequestHandler<CreateAlertRequest>
 {
-    private const int MaxNumberOfAlerts = 20;
     public async Task Handle(CreateAlertRequest request, CancellationToken cancellationToken)
     {
-        var alerts = await store.GetByUserIdAsync(request.UserId, cancellationToken);
+        var user = await userStore.GetByIdAsync(request.UserId, cancellationToken);
+        var alerts = await alertStore.GetByUserIdAsync(request.UserId, cancellationToken);
         
         // Ensure max number of alerts is not exceeded
-        if (alerts.Count >= MaxNumberOfAlerts)
+        if (user.Subscription is null || alerts.Count >= user.Subscription.MaxAlerts)
             throw new Exception("User {UserId} has exceeded max number of alerts.");
-        
-        // If there is already an alert for this keyword, ignore request
-        if (alerts.Any(x => x.Keyword == request.Keyword && x.SourceId == request.SourceId)) 
-            return;
         
         var alert = new Alert
         {
@@ -26,6 +22,6 @@ public class CreateAlertHandler(IAlertStore store) : IRequestHandler<CreateAlert
             SourceId = request.SourceId
         };
 
-        await store.InsertAsync(alert, cancellationToken);
+        await alertStore.InsertAsync(alert, cancellationToken);
     }
 }
