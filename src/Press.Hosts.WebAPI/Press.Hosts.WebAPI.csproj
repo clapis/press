@@ -25,6 +25,7 @@
       <ProjectReference Include="..\Press.Infrastructure.MongoDb\Press.Infrastructure.MongoDb.csproj" />
       <ProjectReference Include="..\Press.Infrastructure.Postmark\Press.Infrastructure.Postmark.csproj" />
       <ProjectReference Include="..\Press.Infrastructure.Scrapers\Press.Infrastructure.Scrapers.csproj" />
+      <ProjectReference Include="..\Press.Infrastructure.Stripe\Press.Infrastructure.Stripe.csproj" />
     </ItemGroup>
 
     <ItemGroup>

@@ -5,11 +5,16 @@ using Press.Core.Domain;
 namespace Press.Infrastructure.MongoDb.Hosted;
 
 internal class Indexes(
+    IMongoCollection<User> users,
     IMongoCollection<Alert> alerts,
     IMongoCollection<Publication> publications) : IHostedService
 {
     public async Task StartAsync(CancellationToken cancellationToken)
     {
+        await users.Indexes.CreateOneAsync(new CreateIndexModel<User>(
+            Builders<User>.IndexKeys.Ascending(x => x.CustomerId),
+            new CreateIndexOptions { Background = true }), cancellationToken: cancellationToken);
+        
         await alerts.Indexes.CreateOneAsync(new CreateIndexModel<Alert>(
             Builders<Alert>.IndexKeys.Ascending(x => x.UserId),
             new CreateIndexOptions { Background = true }), cancellationToken: cancellationToken);

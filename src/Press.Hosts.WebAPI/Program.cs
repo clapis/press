@@ -5,16 +5,18 @@ using Press.Hosts.WebAPI.Telemetry;
 using Press.Infrastructure.MongoDb;
 using Press.Infrastructure.Postmark;
 using Press.Infrastructure.Scrapers;
+using Press.Infrastructure.Stripe;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services
     .AddCore()
     .AddQuartzJobs()
+    .AddStripe(GetSettings<StripeSettings>("Stripe"))
     .AddMongoDb(GetSettings<MongoDbSettings>("MongoDb"))
+    .AddScrapers(GetSettings<ScrapersSettings>("Scrapers"))
     .AddPostmark(GetSettings<PostmarkSettings>("Postmark"))
-    .AddTelemetry(GetSettings<TelemetryOptions>("Telemetry"))
-    .AddScrapers(GetSettings<ScrapersSettings>("Scrapers"));
+    .AddTelemetry(GetSettings<TelemetryOptions>("Telemetry"));
 
 builder.Services
     .AddAuthorization()
@@ -45,15 +47,16 @@ app.UseOutputCache();
 
 app.MapHealthChecks("/healthz");
 
-app.MapSystemEndpoints()
+app.MapKindeWebhooks()
     .MapAlertEndpoints()
     .MapSourceEndpoints()
     .MapProfileEndpoints()
-    .MapWebhookEndpoints()
-    .MapPublicationEndpoints();
+    .MapPublicationEndpoints()
+    .MapStripeWebhooks()
+    .MapPaymentEndpoints()
+    .MapSystemEndpoints();
 
 app.Run();
-
 
 // Required by Component tests
 public partial class Program { }

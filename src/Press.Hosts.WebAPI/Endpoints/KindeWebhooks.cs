@@ -9,38 +9,40 @@ using Press.Core.Features.Users.Create;
 
 namespace Press.Hosts.WebAPI.Endpoints;
 
-public static class WebhookEndpoints
+public static class KindeWebhooks
 {
     private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true };
-    public static WebApplication MapWebhookEndpoints(this WebApplication app)
+
+    public static WebApplication MapKindeWebhooks(this WebApplication app)
     {
-        var group = app.MapGroup("/webhooks");
+        app.MapPost("/webhooks/user-created",
+            async (
+                HttpContext context,
+                [FromServices] IMediator mediator, 
+                [FromServices] IOptionsSnapshot<JwtBearerOptions> options) =>
+            {
+                var result = await ValidateKindeTokenAsync(context.Request.Body, options);
 
-        group.MapPost("/user-created",
-                async ([FromServices] IMediator mediator, [FromServices] IOptionsSnapshot<JwtBearerOptions> options, HttpContext context) =>
-                {
-                    var result = await ValidateTokenAsync(context.Request.Body, options);
+                if (!result.IsValid) return Results.Unauthorized();
 
-                    if (!result.IsValid) return Results.Unauthorized();
-
-                    var jwt = (JsonWebToken) result.SecurityToken;
+                var jwt = (JsonWebToken) result.SecurityToken;
                     
-                    if (jwt.GetPayloadValue<string>("type") != "user.created")
-                        return Results.UnprocessableEntity();
+                if (jwt.GetPayloadValue<string>("type") != "user.created")
+                    return Results.UnprocessableEntity();
 
-                    var user = jwt.GetPayloadValue<JsonElement>("data")
-                        .Deserialize<KindeWebhookData>(JsonOptions)!
-                        .User;
+                var user = jwt.GetPayloadValue<JsonElement>("data")
+                    .Deserialize<KindeWebhookData>(JsonOptions)!
+                    .User;
                     
-                    await mediator.Send(new CreateUser(user.Id, user.Email));
+                await mediator.Send(new CreateUser(user.Id, user.Email));
 
-                    return Results.Ok();
-                });
+                return Results.Ok();
+            });
 
         return app;
     }
 
-    private static async Task<TokenValidationResult> ValidateTokenAsync(Stream body, IOptionsSnapshot<JwtBearerOptions> options)
+    private static async Task<TokenValidationResult> ValidateKindeTokenAsync(Stream body, IOptionsSnapshot<JwtBearerOptions> options)
     {
         using var reader = new StreamReader(body);
         
@@ -89,5 +91,4 @@ public static class WebhookEndpoints
 
     record KindeWebhookData(KindeUser User);
     record KindeUser(string Id, string Email);
-
 }
