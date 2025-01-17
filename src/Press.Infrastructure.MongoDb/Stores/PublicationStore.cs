@@ -1,4 +1,3 @@
-using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 using Press.Core.Domain;
@@ -18,19 +17,16 @@ internal class PublicationStore(IMongoCollection<Publication> publications) : IP
     public async Task SaveAsync(Publication publication, CancellationToken cancellationToken) 
         => await publications.InsertOneAsync(publication, cancellationToken: cancellationToken);
 
-    public Task<List<Publication>> SearchAsync(string query, CancellationToken cancellationToken)
+    public Task<List<Publication>> SearchAsync(string query, string? sourceId, CancellationToken cancellationToken)
     {
-        var search = new BsonDocumentPipelineStageDefinition<Publication, Publication>(new BsonDocument
-        {
-            {
-                "$search",
-                new BsonDocument { { "phrase", new BsonDocument { { "query", query }, { "path", "Contents" } } } }
-            }
-        });
-
-        return publications.Aggregate()
-            .AppendStage(search)
-            .Project<Publication>(Builders<Publication>.Projection.Exclude(f => f.Contents))
+        var search = publications.Aggregate()
+            .Search(Builders<Publication>.Search.Phrase(x => x.Contents, query))
+            .Project<Publication>(Builders<Publication>.Projection.Exclude(f => f.Contents));
+        
+        if (sourceId != null)
+            search = search.Match(x => x.SourceId == sourceId);
+            
+        return search
             .SortByDescending(x => x.Date)
             .Limit(10)
             .ToListAsync(cancellationToken);

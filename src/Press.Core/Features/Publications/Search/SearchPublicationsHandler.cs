@@ -14,7 +14,7 @@ public class SearchPublicationsHandler(IPublicationStore publications, ICachedSo
     public async Task<IReadOnlyCollection<SearchPublicationsResponseItem>> Handle(SearchPublicationsRequest request, CancellationToken cancellationToken)
     {
         var sources = await cache.GetSourceMapAsync(cancellationToken);
-        var results = await publications.SearchAsync(request.Query, cancellationToken);
+        var results = await publications.SearchAsync(request.Query,  null, cancellationToken);
 
         return results.Select(x => Map(x, sources[x.SourceId])).ToList();
     }
