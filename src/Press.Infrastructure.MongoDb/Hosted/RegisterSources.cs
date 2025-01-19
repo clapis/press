@@ -10,7 +10,7 @@ public class RegisterSources(IMongoCollection<Source> collection) : IHostedServi
     {
         var sources = new Source[]
         {
-            new() { Id = "dou", Name = "DOU", Url = "https://www.in.gov.br/leiturajornal", IsEnabled = true, IsOfficial = true },
+            new() { Id = "dou", Name = "DOU", Url = "https://www.in.gov.br/leiturajornal", IsEnabled = false, IsOfficial = true },
             
             new() { Id = "dom_sp_franca", Name = "Franca - SP", Url = "https://www.franca.sp.gov.br/pmf-diario/", IsOfficial = true, IsEnabled = true},
             new() { Id = "dom_sp_ribeirao_preto", Name = "Ribeirão Preto - SP", Url = "https://cespro.com.br/visualizarDiarioOficial.php?cdMunicipio=9314", IsOfficial = true, IsEnabled = true},

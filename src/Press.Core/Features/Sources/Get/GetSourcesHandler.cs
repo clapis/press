@@ -17,10 +17,10 @@ public class GetSourcesHandler(IPublicationStore publications, ICachedSourceStor
         
         var latest = await publications.GetLatestBySourceAsync(cancellationToken);
         
-        var summary = sources.Values
-            .ToDictionary(source => source, source => latest.Single(x => x.SourceId == source.Id));
-        
-        return sources.Values.Select(source => Map(source, latest.SingleOrDefault(x => x.SourceId == source.Id))).ToList();
+        return sources.Values
+            .Where(source => source.IsEnabled)
+            .Select(source => Map(source, latest.SingleOrDefault(x => x.SourceId == source.Id)))
+            .ToList();
     }
 
     private GetSourcesResponseItem Map(Source source, Publication? latest)
