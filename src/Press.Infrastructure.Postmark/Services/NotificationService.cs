@@ -54,7 +54,7 @@ public class NotificationService : INotificationService
         await NotifyAsync(_settings.Sender, subject, body.ToString(), cancellationToken);
     }
 
-    public async Task ReportSourcesStatusAsync(Dictionary<Source, Publication> summary, CancellationToken cancellationToken)
+    public async Task ReportSourcesStatusAsync(Dictionary<Source, Publication?> summary, CancellationToken cancellationToken)
     {
         var subject = "System: Source Status";
 
@@ -64,7 +64,7 @@ public class NotificationService : INotificationService
         {
             body.AppendLine($"{source.Name}");
             body.AppendLine($"IsEnabled: {source.IsEnabled}");
-            body.AppendLine($"Last Publication: {last.Date:dd/MM/yyyy} ({(DateTime.Now - last.Date).Days} days ago)");
+            body.AppendLine(last == null ? "Last Publication: N/A" : $"Last Publication: {last.Date:dd/MM/yyyy} ({(DateTime.Now - last.Date).Days} days ago)");
             body.AppendLine($"Url: {source.Url}");
             body.AppendLine();
         }

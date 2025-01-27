@@ -19,7 +19,7 @@ public class ReportSourcesStatusHandler(
         var latest = await publicationStore.GetLatestBySourceAsync(cancellationToken);
         
         var summary = sources.Values
-            .ToDictionary(source => source, source => latest.Single(x => x.SourceId == source.Id));
+            .ToDictionary(source => source, source => latest.SingleOrDefault(x => x.SourceId == source.Id));
 
         await notificationService.ReportSourcesStatusAsync(summary, cancellationToken);
     }
