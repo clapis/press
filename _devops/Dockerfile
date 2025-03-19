@@ -1,4 +1,4 @@
-FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0-jammy AS build
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:9.0-noble AS build
 ARG TARGETARCH
 WORKDIR /source
 
@@ -26,7 +26,7 @@ RUN dotnet publish "./src/Press.Hosts.WebAPI/Press.Hosts.WebAPI.csproj" \
     --no-restore \
     -o /app
 
-FROM mcr.microsoft.com/dotnet/aspnet:8.0-jammy-chiseled-composite
+FROM mcr.microsoft.com/dotnet/aspnet:9.0-noble-chiseled-composite
 EXPOSE 8080
 WORKDIR /app
 COPY --from=build /app .
