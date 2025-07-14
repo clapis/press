@@ -34,7 +34,7 @@ public static class CommandBuilderExtensions
             
             var mediator = host.Services.GetRequiredService<IMediator>();
             
-            var response = await mediator.Send(request!, context.GetCancellationToken());
+            var response = await mediator.Send(request, context.GetCancellationToken());
             
             if (response is not Unit)
                 Console.WriteLine(JsonSerializer.Serialize(response, new JsonSerializerOptions { WriteIndented = true }));

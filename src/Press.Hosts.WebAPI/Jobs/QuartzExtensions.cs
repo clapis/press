@@ -12,6 +12,7 @@ public static class QuartzExtensions
         services.AddQuartz(quartz =>
         {
             quartz.AddJobAndTrigger<MediatrJob<RunAlerts>>("0 15 0,16,20 * * ?");
+            quartz.AddJobAndTrigger<MediatrJob<ExpireTrials>>("0 0 8 * * ?");
             quartz.AddJobAndTrigger<MediatrJob<ReportStaleSources>>("0 0 12 * * ?");
             quartz.AddJobAndTrigger<MediatrJob<ReportSourcesStatus>>("0 0 12 ? * SAT");
             quartz.AddJobAndTrigger<MediatrJob<ScrapeSourcesRequest>>("0 0 0,16,20 * * ?");

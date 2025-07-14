@@ -6,8 +6,8 @@ namespace Press.Infrastructure.MongoDb.Stores;
 
 public class UserStore(IMongoCollection<User> users) : IUserStore
 {
-    public async Task<List<User>> GetAllAsync(CancellationToken cancellationToken)
-        => await users.Find(_ => true).ToListAsync(cancellationToken);
+    public async Task<List<User>> GetActiveUsersAsync(CancellationToken cancellationToken)
+        => await users.Find(x => x.Subscription != null).ToListAsync(cancellationToken);
     
     public async Task<User> GetByIdAsync(string id, CancellationToken cancellationToken)
         => await users.Find(x => x.Id == id).FirstOrDefaultAsync(cancellationToken);
@@ -25,5 +25,17 @@ public class UserStore(IMongoCollection<User> users) : IUserStore
         var update = Builders<User>.Update.Set(x => x.Subscription, subscription);
 
         await users.UpdateOneAsync(filter, update, new UpdateOptions { IsUpsert = false }, cancellationToken);
+    }
+    
+    public async Task ExpireTrialsAsync(CancellationToken cancellationToken)
+    {
+        var filter = Builders<User>.Filter.And(
+            Builders<User>.Filter.Ne(x => x.Subscription, null),
+            Builders<User>.Filter.Eq(x => x.Subscription!.IsTrial, true),
+            Builders<User>.Filter.Lt(x => x.CreatedOn, DateTime.UtcNow.AddDays(-15)));
+        
+        var update = Builders<User>.Update.Set(x => x.Subscription, null);
+
+        await users.UpdateManyAsync(filter, update, new UpdateOptions { IsUpsert = false }, cancellationToken);
     }
 }

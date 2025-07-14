@@ -15,7 +15,7 @@ public class RunAlertsHandler(
 {
     public async Task Handle(RunAlerts request, CancellationToken cancellationToken)
     {
-        var users = await userStore.GetAllAsync(cancellationToken);
+        var users = await userStore.GetActiveUsersAsync(cancellationToken);
 
         foreach (var user in users)
         {
