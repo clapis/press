@@ -36,7 +36,8 @@ public static class Module
                 .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
                 {
                     UseProxy = settings.UseProxy,
-                    Proxy = settings.UseProxy ? new WebProxy(settings.ProxyAddress) : null
+                    Proxy = settings.UseProxy ? new WebProxy(settings.ProxyAddress) : null,
+                    ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
                 })
                 .SetHandlerLifetime(TimeSpan.FromMinutes(10)));
     }

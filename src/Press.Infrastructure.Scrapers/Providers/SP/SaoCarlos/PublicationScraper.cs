@@ -71,7 +71,6 @@ public class PublicationScraper(
             .QuerySelectorAll("a")
             .OfType<IHtmlAnchorElement>()
             .Select(x => x.Href)
-            .Where(x => x.StartsWith("http://www.saocarlos.sp.gov.br/images/stories/diario_oficial"))
             .Where(x => x.EndsWith(".pdf"))
             .Distinct()
             .ToList();

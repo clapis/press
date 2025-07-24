@@ -12,6 +12,7 @@ using Press.Hosts.Cli.Extensions;
 using Press.Infrastructure.MongoDb;
 using Press.Infrastructure.Postmark;
 using Press.Infrastructure.Scrapers;
+using Press.Infrastructure.Stripe;
 
 await BuildCommandLine()
     .UseHost(_ => Host.CreateDefaultBuilder()
@@ -21,6 +22,7 @@ await BuildCommandLine()
 
             services
                 .AddCore()
+                .AddStripe(GetSettings<StripeSettings>("Stripe"))
                 .AddMongoDb(GetSettings<MongoDbSettings>("MongoDb"))
                 .AddPostmark(GetSettings<PostmarkSettings>("Postmark"))
                 .AddScrapers(GetSettings<ScrapersSettings>("Scrapers"));
