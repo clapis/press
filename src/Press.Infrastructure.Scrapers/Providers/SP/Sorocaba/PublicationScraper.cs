@@ -42,7 +42,7 @@ public class PublicationScraper(
 
     private static IEnumerable<string> Pages()
     {
-        yield return "https://noticias.sorocaba.sp.gov.br/jornal/page/2/";
+        // yield return "https://noticias.sorocaba.sp.gov.br/jornal/page/2/";
         yield return "https://noticias.sorocaba.sp.gov.br/jornal/";
     }
 
