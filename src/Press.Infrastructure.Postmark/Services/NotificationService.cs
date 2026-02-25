@@ -74,6 +74,20 @@ public class NotificationService : INotificationService
         await NotifyAsync(_settings.Sender, subject, body.ToString(), cancellationToken);
     }
 
+    public async Task NotifySourceScrapeErrorAsync(Source source, Exception exception, CancellationToken cancellationToken)
+    {
+        var subject = $"System: {source.Name} Scrape Error";
+
+        var body = new StringBuilder();
+        
+        body.AppendLine(exception.ToString());
+
+        body.AppendLine();
+        body.AppendLine("Ciao, :)");
+
+        await NotifyAsync(_settings.Sender, subject, body.ToString(), cancellationToken);    
+    }
+
     private async Task NotifyAsync(string email, string subject, string body, CancellationToken cancellationToken)
     {
         var msg = new PostmarkMessage

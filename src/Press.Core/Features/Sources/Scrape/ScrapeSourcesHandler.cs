@@ -2,6 +2,7 @@ using System.Diagnostics;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Press.Core.Domain;
+using Press.Core.Infrastructure;
 using Press.Core.Infrastructure.Data;
 using Press.Core.Infrastructure.Scrapers;
 
@@ -16,6 +17,7 @@ public class ScrapeSourcesHandler(
     ISourceStore sourceStore,
     IPublicationStore publicationStore,
     IEnumerable<IPublicationScraper> providers,
+    INotificationService notificationService,
     ILogger<ScrapeSourcesHandler> logger)
     : IRequestHandler<ScrapeSourcesRequest>
 {
@@ -65,6 +67,8 @@ public class ScrapeSourcesHandler(
         }
         catch (Exception ex)
         {
+            await TryNotifyScrapeError(source, ex, cancellationToken);
+            
             logger.LogError(ex, "Scraping: {Source} failed. ({Publications} docs, {Duration} ms)", source.Name, publications, sw.ElapsedMilliseconds);
         }
     }
@@ -80,6 +84,18 @@ public class ScrapeSourcesHandler(
             throw new Exception($"There are multiple scrapers registered with source '{source.Id}'");
 
         return results.Single();
+    }
+
+    private async Task TryNotifyScrapeError(Source source, Exception exception, CancellationToken cancellationToken)
+    {
+        try
+        {
+            await notificationService.NotifySourceScrapeErrorAsync(source, exception, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to notify scrape error for {Source}.", source.Name);
+        }
     }
 
 }
